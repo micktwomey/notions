@@ -174,3 +174,10 @@ class Database(pydantic.BaseModel):
     title: list[RichText]
     parent: Parent
     properties: Properties
+
+
+class PaginatedListResponse(pydantic.BaseModel):
+    object: typing.Literal["list"] = "list"
+    results: list
+    next_cursor: typing.Optional[str]
+    has_more: bool
