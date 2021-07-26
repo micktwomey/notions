@@ -1,0 +1,5 @@
+.vscode
+.pytest_cache
+.nox
+.mypy_cache
+__pycache__
