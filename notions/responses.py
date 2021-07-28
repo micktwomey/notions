@@ -1,7 +1,7 @@
 import datetime
 import enum
-import uuid
 import typing
+import uuid
 
 import pydantic
 

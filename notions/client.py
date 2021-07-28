@@ -7,7 +7,6 @@ import furl
 import httpx
 
 from . import responses
-
 from .models.page import Page
 
 LOG = logging.getLogger(__name__)

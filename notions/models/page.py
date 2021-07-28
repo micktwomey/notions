@@ -5,8 +5,8 @@ import uuid
 
 import pydantic
 
-from .parent import Parent
 from .color import Color
+from .parent import Parent
 
 
 class PageNumberProperty(pydantic.BaseModel):
