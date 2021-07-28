@@ -5,27 +5,8 @@ import typing
 
 import pydantic
 
-
-class Color(enum.Enum):
-    default = "default"
-    gray = "gray"
-    brown = "brown"
-    orange = "orange"
-    yellow = "yellow"
-    green = "green"
-    blue = "blue"
-    purple = "purple"
-    pink = "pink"
-    red = "red"
-    gray_background = "gray_background"
-    brown_background = "brown_background"
-    orange_background = "orange_background"
-    yellow_background = "yellow_background"
-    green_background = "green_background"
-    blue_background = "blue_background"
-    purple_background = "purple_background"
-    pink_background = "pink_background"
-    red_background = "red_background"
+from .models.color import Color
+from .models.parent import Parent
 
 
 class Annotations(pydantic.BaseModel):
@@ -56,19 +37,6 @@ class RichTextText(pydantic.BaseModel):
 
 
 RichText = typing.Union[RichTextText]
-
-
-class PageParent(pydantic.BaseModel):
-    type: typing.Literal["page_id"]
-    page_id: uuid.UUID
-
-
-class WorkspaceParent(pydantic.BaseModel):
-    type: typing.Literal["workspace"] = "workspace"
-    workspace: typing.Literal[True] = True
-
-
-Parent = typing.Union[PageParent, WorkspaceParent]
 
 
 class NumberFormat(enum.Enum):
@@ -128,7 +96,7 @@ class SelectOption(pydantic.BaseModel):
 
 
 class Select(pydantic.BaseModel):
-    options: list[SelectOption]
+    options: typing.List[SelectOption]
 
 
 class SelectProperty(pydantic.BaseModel):
@@ -163,15 +131,15 @@ Property = typing.Union[
     NumberProperty, SelectProperty, CreatedTimeProperty, URLProperty, TitleProperty
 ]
 
-Properties = dict[str, Property]
+Properties = typing.Dict[str, Property]
 
 
 class Database(pydantic.BaseModel):
-    object: typing.Literal["database"]
+    object: typing.Literal["database"] = "database"
     id: uuid.UUID
     created_time: datetime.datetime
     last_edited_time: datetime.datetime
-    title: list[RichText]
+    title: typing.List[RichText]
     parent: Parent
     properties: Properties
 

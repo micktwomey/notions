@@ -11,6 +11,7 @@ httpx = "^0.18.2"
 pydantic = "^1.8.2"
 typer = "^0.3.2"
 furl = "^2.1.2"
+coloredlogs = "^15.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

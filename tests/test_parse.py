@@ -5,6 +5,7 @@ import uuid
 import pydantic
 
 from notions import responses
+from notions.models.parent import WorkspaceParent
 
 # http https://api.notion.com/v1/databases/cc5ef123-05f5-409e-9b34-38043df965b0 "Notion-Version: 2021-05-13" "Authorization: Bearer $NOTION_API_KEY"| pbcopy
 GET_DATABASE_JSON = """
@@ -174,7 +175,7 @@ def test_parse_get_database():
                 text=responses.Text(content="Eurorack", link=None),
             )
         ],
-        parent=responses.WorkspaceParent(),
+        parent=WorkspaceParent(),
         properties={
             "Zone": responses.SelectProperty(
                 id=";vF\\",

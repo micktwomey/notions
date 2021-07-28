@@ -1,9 +1,16 @@
 import contextlib
+import logging
+import typing
+import uuid
 
 import furl
 import httpx
 
 from . import responses
+
+from .models.page import Page
+
+LOG = logging.getLogger(__name__)
 
 
 class NotionAsyncClient:
@@ -47,11 +54,21 @@ class NotionAsyncClient:
                 has_more = page.has_more
                 start_cursor = page.next_cursor
 
-    async def list_databases(self):
+    async def list_databases(self) -> typing.AsyncIterable[responses.Database]:
         """Performs a GET /databases
 
         https://developers.notion.com/reference/get-databases
         """
         async for page in self.paginated_request("GET", self.base_url / "v1/databases"):
             for db in page.results:
+                LOG.debug(db)
                 yield responses.Database.parse_obj(db)
+
+    async def query_database(self, database_id: uuid.UUID):
+        """https://developers.notion.com/reference/post-database-query"""
+        async for page in self.paginated_request(
+            "POST", self.base_url / "v1/databases" / str(database_id) / "query"
+        ):
+            for item in page.results:
+                LOG.debug(item)
+                yield Page.parse_obj(item)
