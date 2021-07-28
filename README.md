@@ -1,1 +1,1 @@
-# Notions - A Python Client Library for Notion
+# Notions - A Python Client Library and CLI for Notion

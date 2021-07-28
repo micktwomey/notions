@@ -1,1 +1,1 @@
-import pydandic
+import pydantic

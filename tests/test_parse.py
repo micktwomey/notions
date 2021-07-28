@@ -4,8 +4,22 @@ import uuid
 
 import pydantic
 
-from notions import responses
+from notions.models.color import Color
+from notions.models.database import (
+    CreatedTimeProperty,
+    Database,
+    Number,
+    NumberProperty,
+    Properties,
+    Select,
+    SelectOption,
+    SelectProperty,
+    TitleProperty,
+    URLProperty,
+)
+from notions.models.number import Number, NumberFormat
 from notions.models.parent import WorkspaceParent
+from notions.models.rich_text import Annotations, RichTextText, Text
 
 # http https://api.notion.com/v1/databases/cc5ef123-05f5-409e-9b34-38043df965b0 "Notion-Version: 2021-05-13" "Authorization: Bearer $NOTION_API_KEY"| pbcopy
 GET_DATABASE_JSON = """
@@ -151,8 +165,8 @@ GET_DATABASE_JSON = """
 
 
 def test_parse_get_database():
-    db = responses.Database.parse_raw(GET_DATABASE_JSON)
-    assert db == responses.Database(
+    db = Database.parse_raw(GET_DATABASE_JSON)
+    assert db == Database(
         object="database",
         id=uuid.UUID("cc5ef123-05f5-409e-9b34-38043df965b0"),
         created_time=datetime.datetime(2021, 7, 12, 7, 3, tzinfo=datetime.timezone.utc),
@@ -160,99 +174,99 @@ def test_parse_get_database():
             2021, 7, 25, 22, 13, tzinfo=datetime.timezone.utc
         ),
         title=[
-            responses.RichTextText(
+            RichTextText(
                 type="text",
                 plain_text="Eurorack",
                 href=None,
-                annotations=responses.Annotations(
+                annotations=Annotations(
                     bold=False,
                     italic=False,
                     strikethrough=False,
                     underline=False,
                     code=False,
-                    color=responses.Color.default,
+                    color=Color.default,
                 ),
-                text=responses.Text(content="Eurorack", link=None),
+                text=Text(content="Eurorack", link=None),
             )
         ],
         parent=WorkspaceParent(),
         properties={
-            "Zone": responses.SelectProperty(
+            "Zone": SelectProperty(
                 id=";vF\\",
                 name="Zone",
                 type="select",
-                select=responses.Select(
+                select=Select(
                     options=[
-                        responses.SelectOption(
+                        SelectOption(
                             id="999d6839-bc19-4c96-b982-be338a128352",
                             name="Rack 1 Bottom",
-                            color=responses.Color.red,
+                            color=Color.red,
                         ),
-                        responses.SelectOption(
+                        SelectOption(
                             id="06dced11-bc1e-4df8-99e7-fe9383af8c80",
                             name="Rack 1 Top Left",
-                            color=responses.Color.yellow,
+                            color=Color.yellow,
                         ),
                     ]
                 ),
             ),
-            "+12V mA": responses.NumberProperty(
+            "+12V mA": NumberProperty(
                 id="J~xw",
                 name="+12V mA",
                 type="number",
-                number=responses.Number(format=responses.NumberFormat.number),
+                number=Number(format=NumberFormat.number),
             ),
-            "Depth (mm)": responses.NumberProperty(
+            "Depth (mm)": NumberProperty(
                 id="a?VV",
                 name="Depth (mm)",
                 type="number",
-                number=responses.Number(format=responses.NumberFormat.number),
+                number=Number(format=NumberFormat.number),
             ),
-            "Created": responses.CreatedTimeProperty(id="gL=>", name="Created"),
-            "Homepage": responses.URLProperty(id="gfHx", name="Homepage"),
-            "5V mA": responses.NumberProperty(
+            "Created": CreatedTimeProperty(id="gL=>", name="Created"),
+            "Homepage": URLProperty(id="gfHx", name="Homepage"),
+            "5V mA": NumberProperty(
                 id="iP{{",
                 name="5V mA",
                 type="number",
-                number=responses.Number(format=responses.NumberFormat.number),
+                number=Number(format=NumberFormat.number),
             ),
-            "-12V mA": responses.NumberProperty(
+            "-12V mA": NumberProperty(
                 id="kpdn",
                 name="-12V mA",
                 type="number",
-                number=responses.Number(format=responses.NumberFormat.number),
+                number=Number(format=NumberFormat.number),
             ),
-            "Manufacturer": responses.SelectProperty(
+            "Manufacturer": SelectProperty(
                 id="nmit",
                 name="Manufacturer",
-                select=responses.Select(
+                select=Select(
                     options=[
-                        responses.SelectOption(
+                        SelectOption(
                             id="85858ee3-1d36-4d61-8e45-90e2d3358464",
                             name="Mutable Instruments",
-                            color=responses.Color.green,
+                            color=Color.green,
                         ),
-                        responses.SelectOption(
+                        SelectOption(
                             id="ea2042b5-7176-4c7e-ad11-b563b3998754",
                             name="ALM Busy Circuits",
-                            color=responses.Color.brown,
+                            color=Color.brown,
                         ),
-                        responses.SelectOption(
+                        SelectOption(
                             id="44d611d8-62ad-454c-8eae-1bf81624f185",
                             name="Intellijel",
-                            color=responses.Color.purple,
+                            color=Color.purple,
                         ),
                     ],
                 ),
             ),
-            "HP": responses.NumberProperty(
+            "HP": NumberProperty(
                 id="uF=u",
                 name="HP",
                 type="number",
-                number=responses.Number(format=responses.NumberFormat.number),
+                number=Number(format=NumberFormat.number),
             ),
-            "Modulargrid": responses.URLProperty(id="wt@r", name="Modulargrid"),
-            "Name": responses.TitleProperty(id="title", name="Name"),
+            "Modulargrid": URLProperty(id="wt@r", name="Modulargrid"),
+            "Name": TitleProperty(id="title", name="Name"),
         },
     )
 
@@ -297,35 +311,35 @@ def test_parse_properties():
     """
 
     class Props(pydantic.BaseModel):
-        properties: responses.Properties
+        properties: Properties
 
     properties = Props.parse_raw(properties_json)
     assert properties == Props(
         properties={
-            "Zone": responses.SelectProperty(
+            "Zone": SelectProperty(
                 id=";vF\\",
                 name="Zone",
                 type="select",
-                select=responses.Select(
+                select=Select(
                     options=[
-                        responses.SelectOption(
+                        SelectOption(
                             id="999d6839-bc19-4c96-b982-be338a128352",
                             name="Rack 1 Bottom",
-                            color=responses.Color.red,
+                            color=Color.red,
                         ),
-                        responses.SelectOption(
+                        SelectOption(
                             id="06dced11-bc1e-4df8-99e7-fe9383af8c80",
                             name="Rack 1 Top Left",
-                            color=responses.Color.yellow,
+                            color=Color.yellow,
                         ),
                     ]
                 ),
             ),
-            "+12V mA": responses.NumberProperty(
+            "+12V mA": NumberProperty(
                 id="J~xw",
                 name="+12V mA",
                 type="number",
-                number=responses.Number(format=responses.NumberFormat.number),
+                number=Number(format=NumberFormat.number),
             ),
         }
     )
@@ -343,10 +357,10 @@ def test_parse_number_property():
     }
     """
 
-    assert responses.NumberProperty.parse_raw(number_json) == responses.NumberProperty(
+    assert NumberProperty.parse_raw(number_json) == NumberProperty(
         id="uF=u",
         name="HP",
-        number=responses.Number(format=responses.NumberFormat.number),
+        number=Number(format=NumberFormat.number),
     )
 
 
@@ -378,25 +392,25 @@ def test_parse_select_property():
     }
     """
 
-    assert responses.SelectProperty.parse_raw(select_json) == responses.SelectProperty(
+    assert SelectProperty.parse_raw(select_json) == SelectProperty(
         id="nmit",
         name="Manufacturer",
-        select=responses.Select(
+        select=Select(
             options=[
-                responses.SelectOption(
+                SelectOption(
                     id="85858ee3-1d36-4d61-8e45-90e2d3358464",
                     name="Mutable Instruments",
-                    color=responses.Color.green,
+                    color=Color.green,
                 ),
-                responses.SelectOption(
+                SelectOption(
                     id="ea2042b5-7176-4c7e-ad11-b563b3998754",
                     name="ALM Busy Circuits",
-                    color=responses.Color.brown,
+                    color=Color.brown,
                 ),
-                responses.SelectOption(
+                SelectOption(
                     id="44d611d8-62ad-454c-8eae-1bf81624f185",
                     name="Intellijel",
-                    color=responses.Color.purple,
+                    color=Color.purple,
                 ),
             ],
         ),
@@ -413,9 +427,9 @@ def test_parse_created_time_property():
     }
     """
 
-    assert responses.CreatedTimeProperty.parse_raw(
-        created_json
-    ) == responses.CreatedTimeProperty(id="gL=>", name="Created")
+    assert CreatedTimeProperty.parse_raw(created_json) == CreatedTimeProperty(
+        id="gL=>", name="Created"
+    )
 
 
 def test_parse_url_property():
@@ -428,9 +442,7 @@ def test_parse_url_property():
     }
     """
 
-    assert responses.URLProperty.parse_raw(url_json) == responses.URLProperty(
-        id="gfHx", name="Homepage"
-    )
+    assert URLProperty.parse_raw(url_json) == URLProperty(id="gfHx", name="Homepage")
 
 
 def test_parse_title_property():
@@ -443,6 +455,4 @@ def test_parse_title_property():
     }
     """
 
-    assert responses.TitleProperty.parse_raw(title_json) == responses.TitleProperty(
-        id="title", name="Name"
-    )
+    assert TitleProperty.parse_raw(title_json) == TitleProperty(id="title", name="Name")
