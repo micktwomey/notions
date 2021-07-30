@@ -2,19 +2,27 @@ import contextlib
 import logging
 import typing
 import uuid
-from os import path
 
 import furl
 import httpx
 
 from .models.database import Database
 from .models.page import Page
+from .models.request import (
+    CreateDatabaseRequest,
+    CreatePageRequest,
+    QueryDatabaseRequest,
+    SearchRequest,
+)
 from .models.response import PaginatedListResponse
+from .models.update import UpdatePageRequest
 
 LOG = logging.getLogger(__name__)
 
 
 class NotionAsyncClient:
+    """Async HTTP client for talking to Notion"""
+
     def __init__(
         self,
         api_token: str,
@@ -26,6 +34,7 @@ class NotionAsyncClient:
         self.notion_version = notion_version
 
     def get_url_for_path(self, *path_segments: str) -> furl.furl:
+        """Append path segments to the base url"""
         url = self.base_url.copy()
         for segment in path_segments:
             url = url / segment
@@ -43,8 +52,16 @@ class NotionAsyncClient:
             yield httpx_client
 
     async def request(
-        self, method: str, url: furl.furl, raise_for_status=True, *args, **kwargs
+        self,
+        method: str,
+        url: furl.furl,
+        raise_for_status=True,
+        json: typing.Any = None,
+        *args,
+        **kwargs,
     ):
+        """Perform a HTTP request"""
+        LOG.debug(f"request: {method=} {url=} {json=}")
         async with self.async_client() as client:
             response = await client.request(method, url.url, *args, **kwargs)
             if raise_for_status:
@@ -52,16 +69,30 @@ class NotionAsyncClient:
             return response
 
     async def paginated_request(
-        self, method: str, url: furl.furl, raise_for_status=True, *args, **kwargs
+        self,
+        method: str,
+        url: furl.furl,
+        pagination_in_json: bool,
+        raise_for_status=True,
+        json: typing.Any = None,
+        *args,
+        **kwargs,
     ):
         """Perform a httpx request, yielding pages"""
         url = url.copy()
         has_more = True
         start_cursor = None
+        LOG.debug(f"paginated_request: {method=} {url=} {json=}")
         async with self.async_client() as client:
             while has_more:
                 if start_cursor is not None:
-                    url.set({"start_cursor": start_cursor})
+                    # start_cursor is set either in the json body or the query params, depending on the request
+                    if pagination_in_json:
+                        LOG.debug(f"Setting {start_cursor=} in JSON body")
+                        json["start_cursor"] = start_cursor
+                    else:
+                        LOG.debug(f"Setting {start_cursor=} in url params")
+                        url.set({"start_cursor": start_cursor})
                 response = await client.request(method, url.url, *args, **kwargs)
                 if raise_for_status:
                     response.raise_for_status()
@@ -71,21 +102,81 @@ class NotionAsyncClient:
                 has_more = page.has_more
                 start_cursor = page.next_cursor
 
+    async def get_database(self, database_id: uuid.UUID) -> Database:
+        """https://developers.notion.com/reference/get-database"""
+        raise NotImplementedError()
+
+    async def query_database(
+        self, database_id: uuid.UUID, query: QueryDatabaseRequest
+    ) -> typing.AsyncIterable[Page]:
+        """https://developers.notion.com/reference/post-database-query"""
+        async for page in self.paginated_request(
+            "POST",
+            self.base_url / "v1/databases" / str(database_id) / "query",
+            json=query.json(),
+            pagination_in_json=True,
+        ):
+            for item in page.results:
+                LOG.debug(f"{item=}")
+                yield item
+
     async def list_databases(self) -> typing.AsyncIterable[Database]:
         """Performs a GET /databases
 
         https://developers.notion.com/reference/get-databases
         """
-        async for page in self.paginated_request("GET", self.base_url / "v1/databases"):
-            for db in page.results:
-                LOG.debug(db)
-                yield Database.parse_obj(db)
-
-    async def query_database(self, database_id: uuid.UUID):
-        """https://developers.notion.com/reference/post-database-query"""
         async for page in self.paginated_request(
-            "POST", self.base_url / "v1/databases" / str(database_id) / "query"
+            "GET", self.base_url / "v1/databases", pagination_in_json=False
+        ):
+            for db in page.results:
+                LOG.debug(f"{db=}")
+                yield db
+
+    async def create_database(
+        self,
+        database: CreateDatabaseRequest,
+    ) -> Database:
+        """https://developers.notion.com/reference/create-a-database"""
+        raise NotImplementedError()
+
+    async def get_page(self, page_id: uuid.UUID) -> Page:
+        """https://developers.notion.com/reference/get-page"""
+        raise NotImplementedError()
+
+    async def create_page(self, page: CreatePageRequest) -> Page:
+        """https://developers.notion.com/reference/post-page"""
+        raise NotImplementedError()
+
+    async def update_page(self, page_id: uuid.UUID, page: UpdatePageRequest) -> Page:
+        """https://developers.notion.com/reference/patch-page"""
+        raise NotImplementedError()
+
+    async def get_block_children(self, block_id: uuid.UUID):
+        """https://developers.notion.com/reference/get-block-children"""
+        raise NotImplementedError()
+
+    async def append_block_children(self, block_id: uuid.UUID, children: list):
+        """https://developers.notion.com/reference/patch-block-children"""
+        raise NotImplementedError()
+
+    async def get_user(self, user_id: uuid.UUID):
+        """https://developers.notion.com/reference/get-user"""
+        raise NotImplementedError()
+
+    async def list_all_users(
+        self,
+    ):
+        """https://developers.notion.com/reference/get-users"""
+        raise NotImplementedError()
+
+    async def search(self, search_request: SearchRequest):
+        """https://developers.notion.com/reference/post-search"""
+        async for page in self.paginated_request(
+            "POST",
+            self.base_url / "v1/search",
+            json=search_request.json(exclude_unset=True),
+            pagination_in_json=True,
         ):
             for item in page.results:
-                LOG.debug(item)
-                yield Page.parse_obj(item)
+                LOG.debug(f"{item=}")
+                yield item

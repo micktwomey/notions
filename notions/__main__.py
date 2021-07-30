@@ -1,16 +1,27 @@
 import asyncio
-import io
+import dataclasses
 import json
-import sys
+import logging
 import typing
 import uuid
 
-import colorlog
+import coloredlogs
 import typer
 
 from .client import NotionAsyncClient
+from .models.request import QueryDatabaseRequest, SearchRequest
 
 app = typer.Typer()
+
+LOG = logging.getLogger(__name__)
+
+
+@dataclasses.dataclass
+class Config:
+    notion_api_key: str
+
+
+CONFIG = Config(notion_api_key="unset")
 
 
 async def run_list_databases(client: NotionAsyncClient):
@@ -19,24 +30,24 @@ async def run_list_databases(client: NotionAsyncClient):
 
 
 @app.command()
-def list_databases(notion_api_key: str = typer.Option(..., envvar="NOTION_API_KEY")):
+def list_databases():
     """List available databases"""
-    client = NotionAsyncClient(notion_api_key)
+    client = NotionAsyncClient(CONFIG.notion_api_key)
     asyncio.run(run_list_databases(client))
 
 
 async def run_query_databases(client: NotionAsyncClient, database_id: uuid.UUID):
-    async for item in client.query_database(database_id):
+    query = QueryDatabaseRequest(filter={}, sorts=[])
+    async for item in client.query_database(database_id, query):
         print(item.json())
 
 
 @app.command()
 def query_database(
     database_id: uuid.UUID,
-    notion_api_key: str = typer.Option(..., envvar="NOTION_API_KEY"),
 ):
     """Query a database for pages"""
-    client = NotionAsyncClient(notion_api_key)
+    client = NotionAsyncClient(CONFIG.notion_api_key)
     asyncio.run(run_query_databases(client, database_id))
 
 
@@ -50,9 +61,11 @@ async def run_api(
 ):
     url = client.get_url_for_path(path)
     if paginated:
-        async for page in client.paginated_request(method, url):
+        async for page in client.paginated_request(
+            method, url, pagination_in_json=False
+        ):
             for item in page.results:
-                output.write(json.dumps(item).encode("utf-8"))
+                output.write(item.json().encode("utf-8"))
     else:
         response = await client.request(method, url)
         output.write(response.content)
@@ -60,7 +73,6 @@ async def run_api(
 
 @app.command()
 def api(
-    notion_api_key: str = typer.Option(..., envvar="NOTION_API_KEY"),
     method: str = typer.Argument("GET", help="HTTP method, defaults to GET."),
     path: str = typer.Argument(
         ...,
@@ -77,15 +89,40 @@ def api(
     ),
 ):
     """Perform an API call with authentication"""
-    client = NotionAsyncClient(notion_api_key)
+    client = NotionAsyncClient(CONFIG.notion_api_key)
     asyncio.run(run_api(client, method, path, paginate, input, output))
 
 
+async def run_search(client: NotionAsyncClient, query: typing.Optional[str]):
+    search_request = SearchRequest(query=query)
+    async for item in client.search(search_request):
+        print(item.json())
+
+
+@app.command()
+def search(
+    query: str = typer.Option(
+        "",
+        help="When supplied, limits which pages are returned by comparing the query to the page title.",
+    )
+):
+    """Search for pages and databases"""
+    client = NotionAsyncClient(CONFIG.notion_api_key)
+    asyncio.run(run_search(client, query))
+
+
 @app.callback()
-def main(debug: bool = False, verbose: bool = False):
-    """Notion API CLI Client"""
+def main(
+    debug: bool = False,
+    verbose: bool = False,
+    notion_api_key: str = typer.Option(..., envvar="NOTION_API_KEY"),
+):
+    """Notions: a Notion API CLI client"""
     level = "DEBUG" if debug else ("INFO" if verbose else "WARNING")
-    colorlog.basicConfig(level=level)
+    coloredlogs.install(level=level)
+    CONFIG.notion_api_key = notion_api_key
+
+    LOG.debug(f"{CONFIG=}")
 
 
 if __name__ == "__main__":

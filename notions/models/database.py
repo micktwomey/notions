@@ -7,7 +7,7 @@ import pydantic
 
 from .color import Color
 from .number import Number
-from .parent import Parent
+from .parent import DatabaseParents
 from .rich_text import RichText
 
 
@@ -56,8 +56,20 @@ class TitleProperty(pydantic.BaseModel):
     title: dict = pydantic.Field(default_factory=dict)
 
 
+class RichTextProperty(pydantic.BaseModel):
+    id: str
+    name: str
+    type: typing.Literal["rich_text"] = "rich_text"
+    rich_text: dict = pydantic.Field(default_factory=dict)
+
+
 Property = typing.Union[
-    NumberProperty, SelectProperty, CreatedTimeProperty, URLProperty, TitleProperty
+    NumberProperty,
+    SelectProperty,
+    CreatedTimeProperty,
+    URLProperty,
+    TitleProperty,
+    RichTextProperty,
 ]
 
 Properties = typing.Dict[str, Property]
@@ -69,5 +81,5 @@ class Database(pydantic.BaseModel):
     created_time: datetime.datetime
     last_edited_time: datetime.datetime
     title: typing.List[RichText]
-    parent: Parent
+    parent: DatabaseParents
     properties: Properties

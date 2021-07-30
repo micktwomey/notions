@@ -19,4 +19,7 @@ class DatabaseParent(pydantic.BaseModel):
     database_id: uuid.UUID
 
 
-Parent = typing.Union[PageParent, WorkspaceParent, DatabaseParent]
+# Each content type has slightly different valid parents
+AllParents = typing.Union[PageParent, WorkspaceParent, DatabaseParent]
+DatabaseParents = typing.Union[PageParent, WorkspaceParent]
+PageParents = typing.Union[PageParent, DatabaseParent]
