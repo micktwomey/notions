@@ -75,7 +75,7 @@ def default_text_formatter(item: typing.Union[Database, Page]) -> str:
     titles = [t.plain_text for t in title_property]
     if titles:
         title = titles[0]
-    return f"{item_type} : {item.id} : {title} (last_edited_time={item.last_edited_time.isoformat(' ')})"
+    return f"{item_type} : {item.id} : {title} : {list(item.properties)}"
 
 
 async def run(
