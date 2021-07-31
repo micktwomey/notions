@@ -8,7 +8,6 @@ from notions.models.color import Color
 from notions.models.database import (
     CreatedTimeProperty,
     Database,
-    Number,
     NumberProperty,
     Properties,
     Select,

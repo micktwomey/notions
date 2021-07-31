@@ -61,9 +61,15 @@ class CreatePageRequest(pydantic.BaseModel):
     children: list  # TODO: define block types
 
 
+class QueryDatabaseSort(pydantic.BaseModel):
+    property: typing.Optional[str] = None
+    timestamp: typing.Optional[str] = None
+    direction: typing.Literal["ascending", "descending"]
+
+
 class QueryDatabaseRequest(pydantic.BaseModel):
-    filter: dict  # TODO: define filter types
-    sorts: list  # TODO: define sort types
+    filter: typing.Optional[dict] = None  # TODO: define filter types
+    sorts: typing.Optional[typing.List[QueryDatabaseSort]] = None
     start_cursor: typing.Optional[str] = None
     page_size: int = 100
 

@@ -1,4 +1,5 @@
 import contextlib
+import json
 import logging
 import typing
 import uuid
@@ -47,6 +48,7 @@ class NotionAsyncClient:
             headers={
                 "Authorization": f"Bearer {self.api_token}",
                 "Notion-Version": self.notion_version,
+                "Content-Type": "application/json",
             },
         ) as httpx_client:
             yield httpx_client
@@ -63,7 +65,7 @@ class NotionAsyncClient:
         """Perform a HTTP request"""
         LOG.debug(f"request: {method=} {url=} {json=}")
         async with self.async_client() as client:
-            response = await client.request(method, url.url, *args, **kwargs)
+            response = await client.request(method, url.url, json=json, *args, **kwargs)
             if raise_for_status:
                 response.raise_for_status()
             return response
@@ -74,7 +76,7 @@ class NotionAsyncClient:
         url: furl.furl,
         pagination_in_json: bool,
         raise_for_status=True,
-        json: typing.Any = None,
+        data: str = None,
         *args,
         **kwargs,
     ):
@@ -82,21 +84,26 @@ class NotionAsyncClient:
         url = url.copy()
         has_more = True
         start_cursor = None
-        LOG.debug(f"paginated_request: {method=} {url=} {json=}")
         async with self.async_client() as client:
             while has_more:
                 if start_cursor is not None:
                     # start_cursor is set either in the json body or the query params, depending on the request
                     if pagination_in_json:
                         LOG.debug(f"Setting {start_cursor=} in JSON body")
-                        json["start_cursor"] = start_cursor
+                        # Since the data is already encoded by pydantic, load, update and re-encode it
+                        request_json = json.loads(data)
+                        request_json["start_cursor"] = start_cursor
+                        data = json.dumps(request_json)
                     else:
                         LOG.debug(f"Setting {start_cursor=} in url params")
                         url.set({"start_cursor": start_cursor})
-                response = await client.request(method, url.url, *args, **kwargs)
+                LOG.debug(f"paginated_request: {method=} {url=} {data=}")
+                response = await client.request(
+                    method, url.url, data=data, *args, **kwargs
+                )
+                LOG.debug(f"{response.content=}")
                 if raise_for_status:
                     response.raise_for_status()
-                LOG.debug(f"{response.content=}")
                 page = PaginatedListResponse.parse_raw(response.content)
                 yield page
                 has_more = page.has_more
@@ -113,7 +120,7 @@ class NotionAsyncClient:
         async for page in self.paginated_request(
             "POST",
             self.base_url / "v1/databases" / str(database_id) / "query",
-            json=query.json(),
+            data=query.json(exclude_unset=True),
             pagination_in_json=True,
         ):
             for item in page.results:
@@ -174,7 +181,7 @@ class NotionAsyncClient:
         async for page in self.paginated_request(
             "POST",
             self.base_url / "v1/search",
-            json=search_request.json(exclude_unset=True),
+            data=search_request.json(exclude_unset=True),
             pagination_in_json=True,
         ):
             for item in page.results:
