@@ -6,9 +6,9 @@ import typing
 
 class OutputFormats(enum.Enum):
     text = "text"
-    json = "json"
-    jsonl = "jsonl"
-    yaml = "yaml"
+    notion_json = "notion_json"
+    notion_jsonl = "notion_jsonl"
+    notion_yaml = "notion_yaml"
 
 
 @dataclasses.dataclass

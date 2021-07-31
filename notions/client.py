@@ -181,7 +181,7 @@ class NotionAsyncClient:
         async for page in self.paginated_request(
             "POST",
             self.base_url / "v1/search",
-            data=search_request.json(exclude_unset=True),
+            data=search_request.json(exclude_unset=True, exclude_none=True),
             pagination_in_json=True,
         ):
             for item in page.results:

@@ -22,7 +22,6 @@ async def run_list_databases(
         client.list_databases(),
         output=output,
         output_format=output_format,
-        text_formatter=lambda db: f"{db.id} : {db.title[0].plain_text} ({db.last_edited_time})",
     )
 
 
@@ -59,7 +58,6 @@ async def run_query_databases(
         client.query_database(database_id, query),
         output=output,
         output_format=output_format,
-        text_formatter=lambda item: f"{item.id} : {item.url} ({item.last_edited_time})",
     )
 
 

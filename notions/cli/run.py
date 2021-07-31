@@ -5,6 +5,9 @@ import itertools
 import logging
 import typing
 
+from notions.models.database import Database
+from notions.models.page import Page, PageTitleProperty
+
 from . import yaml
 from .config import OutputFormats
 
@@ -21,7 +24,7 @@ async def text_format(
         output.write("\n")
 
 
-async def json_format(
+async def notion_json_format(
     iterable: typing.AsyncIterable,
     output: typing.TextIO,
 ):
@@ -37,7 +40,7 @@ async def json_format(
     output.write("\n]")
 
 
-async def jsonl_format(
+async def notion_jsonl_format(
     iterable: typing.AsyncIterable,
     output: typing.TextIO,
 ):
@@ -46,7 +49,7 @@ async def jsonl_format(
         output.write("\n")
 
 
-async def yaml_format(
+async def notion_yaml_format(
     iterable: typing.AsyncIterable,
     output: typing.TextIO,
 ):
@@ -56,18 +59,37 @@ async def yaml_format(
     yaml.dump(items, output)
 
 
+def default_text_formatter(item: typing.Union[Database, Page]) -> str:
+    title = "-No title-"
+    item_type = "unknown"
+    if isinstance(item, Database):
+        title_property = item.title
+        item_type = "database"
+    else:
+        item_type = "page"
+        if "Name" in item.properties and isinstance(
+            item.properties["Name"], PageTitleProperty
+        ):
+            title_property = item.properties["Name"].title
+
+    titles = [t.plain_text for t in title_property]
+    if titles:
+        title = titles[0]
+    return f"{item_type} : {item.id} : {title} (last_edited_time={item.last_edited_time.isoformat(' ')})"
+
+
 async def run(
     iterable: typing.AsyncIterable,
     output: typing.TextIO,
     output_format: OutputFormats,
-    text_formatter: typing.Callable[[typing.Any], str] = lambda item: f"{item=}",
+    text_formatter: typing.Callable[[typing.Any], str] = default_text_formatter,
 ):
     """Helper for commands which handles formatting output"""
-    if output_format == OutputFormats.json:
-        await json_format(iterable, output)
-    elif output_format == OutputFormats.jsonl:
-        await jsonl_format(iterable, output)
-    elif output_format == OutputFormats.yaml:
-        await yaml_format(iterable, output)
+    if output_format == OutputFormats.notion_json:
+        await notion_json_format(iterable, output)
+    elif output_format == OutputFormats.notion_jsonl:
+        await notion_jsonl_format(iterable, output)
+    elif output_format == OutputFormats.notion_yaml:
+        await notion_yaml_format(iterable, output)
     else:
         await text_format(iterable, output, text_formatter)

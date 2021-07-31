@@ -43,7 +43,12 @@ NoAliasDumper.add_representer(NumberFormat, number_format_yaml_representer)
 
 
 def decimal_yaml_representer(dumper: yaml.Dumper, data: decimal.Decimal):
-    return dumper.represent_scalar("tag:yaml.org,2002:float", str(data))
+    tag = "tag:yaml.org,2002:float"
+    value = str(data)
+    # If we don't do this we get a nasty `!!float '28'`
+    if "." not in value:
+        tag = "tag:yaml.org,2002:int"
+    return dumper.represent_scalar(tag, value)
 
 
 NoAliasDumper.add_representer(decimal.Decimal, decimal_yaml_representer)
