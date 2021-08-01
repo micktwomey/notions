@@ -148,7 +148,10 @@ class NotionAsyncClient:
 
     async def get_page(self, page_id: uuid.UUID) -> Page:
         """https://developers.notion.com/reference/get-page"""
-        raise NotImplementedError()
+        response = await self.request(
+            "GET", self.get_url_for_path("v1/pages", str(page_id))
+        )
+        return Page.parse_raw(response.content)
 
     async def create_page(self, page: CreatePageRequest) -> Page:
         """https://developers.notion.com/reference/post-page"""

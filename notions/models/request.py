@@ -1,3 +1,8 @@
+"""Models for requests to Notion
+
+Models for searches, creation and modification.
+"""
+
 import datetime
 import decimal
 import typing
@@ -21,14 +26,14 @@ class PageNumberProperty(pydantic.BaseModel):
     number: decimal.Decimal
 
 
-class PageSelect(pydantic.BaseModel):
+class SelectOption(pydantic.BaseModel):
     name: str
     color: Color
 
 
 class PageSelectProperty(pydantic.BaseModel):
     type: typing.Literal["select"] = "select"
-    select: PageSelect
+    select: SelectOption
 
 
 class PageCreatedTimeProperty(pydantic.BaseModel):

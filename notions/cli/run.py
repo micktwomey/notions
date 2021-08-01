@@ -14,17 +14,33 @@ from .config import OutputFormats
 LOG = logging.getLogger(__name__)
 
 
-async def text_format(
+def text_format_item(
+    item: typing.Union[Page, Database],
+    output: typing.TextIO,
+    text_formatter: typing.Callable[[typing.Any], str],
+):
+    output.write(text_formatter(item))
+    output.write("\n")
+
+
+async def text_format_iterable(
     iterable: typing.AsyncIterable,
     output: typing.TextIO,
     text_formatter: typing.Callable[[typing.Any], str],
 ):
     async for item in iterable:
-        output.write(text_formatter(item))
-        output.write("\n")
+        text_format_item(item, output, text_formatter)
 
 
-async def notion_json_format(
+def notion_json_format_item(
+    item: typing.Union[Page, Database],
+    output: typing.TextIO,
+):
+    output.write(item.json())
+    output.write("\n")
+
+
+async def notion_json_format_iterable(
     iterable: typing.AsyncIterable,
     output: typing.TextIO,
 ):
@@ -40,7 +56,7 @@ async def notion_json_format(
     output.write("\n]")
 
 
-async def notion_jsonl_format(
+async def notion_jsonl_format_iterable(
     iterable: typing.AsyncIterable,
     output: typing.TextIO,
 ):
@@ -49,7 +65,14 @@ async def notion_jsonl_format(
         output.write("\n")
 
 
-async def notion_yaml_format(
+def notion_yaml_format_item(
+    item: typing.Union[Page, Database],
+    output: typing.TextIO,
+):
+    yaml.dump(item.dict(), output)
+
+
+async def notion_yaml_format_iterable(
     iterable: typing.AsyncIterable,
     output: typing.TextIO,
 ):
@@ -86,10 +109,27 @@ async def run(
 ):
     """Helper for commands which handles formatting output"""
     if output_format == OutputFormats.notion_json:
-        await notion_json_format(iterable, output)
+        await notion_json_format_iterable(iterable, output)
     elif output_format == OutputFormats.notion_jsonl:
-        await notion_jsonl_format(iterable, output)
+        await notion_jsonl_format_iterable(iterable, output)
     elif output_format == OutputFormats.notion_yaml:
-        await notion_yaml_format(iterable, output)
+        await notion_yaml_format_iterable(iterable, output)
     else:
-        await text_format(iterable, output, text_formatter)
+        await text_format_iterable(iterable, output, text_formatter)
+
+
+async def run_single_item(
+    awaitable: typing.Awaitable[typing.Union[Page, Database]],
+    output: typing.TextIO,
+    output_format: OutputFormats,
+    text_formatter: typing.Callable[[typing.Any], str] = default_text_formatter,
+):
+    item = await awaitable
+    if output_format == OutputFormats.notion_json:
+        notion_json_format_item(item, output)
+    elif output_format == OutputFormats.notion_jsonl:
+        notion_json_format_item(item, output)
+    elif output_format == OutputFormats.notion_yaml:
+        notion_yaml_format_item(item, output)
+    else:
+        text_format_item(item, output, text_formatter)

@@ -17,8 +17,8 @@ class PageNumberProperty(pydantic.BaseModel):
     number: decimal.Decimal
 
 
-class PageSelect(pydantic.BaseModel):
-    id: str
+class SelectOption(pydantic.BaseModel):
+    id: uuid.UUID
     name: str
     color: Color
 
@@ -26,7 +26,7 @@ class PageSelect(pydantic.BaseModel):
 class PageSelectProperty(pydantic.BaseModel):
     id: str
     type: typing.Literal["select"] = "select"
-    select: PageSelect
+    select: SelectOption
 
 
 class PageCreatedTimeProperty(pydantic.BaseModel):
@@ -111,7 +111,7 @@ class PagePhoneNumberProperty(pydantic.BaseModel):
 
 
 class MultiSelectOption(pydantic.BaseModel):
-    id: str
+    id: uuid.UUID
     name: str
     color: Color
 

@@ -8,13 +8,14 @@ import typer
 from notions.client import NotionAsyncClient
 from notions.models.request import SearchRequest
 
-from . import database
+from . import database, page
 from .api import run_api
 from .config import CONFIG, OutputFormats
 from .search import run_search
 
 app = typer.Typer()
 app.add_typer(database.app, name="database")
+app.add_typer(page.app, name="page")
 
 LOG = logging.getLogger(__name__)
 
