@@ -4,6 +4,23 @@ A command line client and API library for [Notion](https://notion.so).
 
 Uses the [Notion API](https://developers.notion.com) to communicate with your Notion pages and databases.
 
+- [Notions - A Python Client Library and CLI for Notion](#notions---a-python-client-library-and-cli-for-notion)
+- [Installation](#installation)
+  - [pipx for CLI usage anywhere](#pipx-for-cli-usage-anywhere)
+  - [pip](#pip)
+  - [poetry](#poetry)
+  - [pipenv](#pipenv)
+- [Authentication](#authentication)
+- [Command Line Usage](#command-line-usage)
+  - [Output Formats](#output-formats)
+  - [Commands](#commands)
+    - [notions api](#notions-api)
+    - [notions search](#notions-search)
+    - [notions database list](#notions-database-list)
+    - [notions database query](#notions-database-query)
+    - [notions page get](#notions-page-get)
+- [API](#api)
+
 # Installation
 
 ## pipx for CLI usage anywhere
@@ -67,7 +84,9 @@ Formats you can specify with `notions --output-format`
 3. `notion_yaml` - Parses API output and dumps back as YAML, with multiple items in a list.
 4. `text` (default) - Parse API output and return a simple text representation. Handy for looking up page and database ids.
 
-## notions api
+## Commands
+
+### notions api
 
 `notions api` allows you to issue requests using the authentication features of the client.
 
@@ -83,7 +102,7 @@ notions api GET /v1/databases/
 notions --output-format notion_yaml api GET /v1/databases/ --paginate
 ```
 
-## notions search
+### notions search
 
 `notions search` allows you to search across all databases and pages you have shared with the Notion integration you created. You can restrict the search with `--query SOME_QUERY_STRING` and items which have a matching title will be returned.
 
@@ -92,15 +111,60 @@ notions --output-format notion_yaml api GET /v1/databases/ --paginate
 notions search --query example
 ```
 
-## notions database list
+### notions database list
 
 `notions database list` lists all the databases the integration has access to.
 
-## notions database query
+### notions database query
 
 Run a query against all pages in a given database. You'll need the database UUID from something like `notions database list`.
 
 ```sh
 # Show all pages in the given db and sort by the HP property in descending order
 notions database query cc5ef123-05f5-409e-9b34-38043df965b0 --sort-property HP:descending
+```
+
+### notions page get
+
+Get a single page.
+
+```sh
+# Get a page in YAML
+notions --output-format notion_yaml page get ccad10e7-c776-423e-9662-6ad5fb1256d6
+```
+
+# API
+
+The main way to use the library is via the HTTP client (see [examples/basic.py](examples/basic.py) for same code):
+
+
+```python
+import asyncio
+import os
+
+from notions.client import NotionAsyncClient
+
+
+async def main():
+    api_token = os.environ.get("NOTION_API_KEY", "no-token-set")
+    notion_client = NotionAsyncClient(api_token)
+
+    # Do a straight HTTP call with authentication
+    async with notion_client.async_client() as client:
+        url = notion_client.get_url_for_path("/v1/databases")
+        response = await client.request("GET", url.url)
+        print(response)
+        print(response.json())
+        response.raise_for_status()
+
+    # Do a list db call (automatically reads all pages)
+    # Will give you a notions.models.database.Database
+    async for db in notion_client.list_databases():
+        print(db.id)
+        print(db.title)
+        print(db)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```

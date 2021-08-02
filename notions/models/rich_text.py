@@ -25,7 +25,7 @@ class Text(pydantic.BaseModel):
 
 
 class RichTextText(pydantic.BaseModel):
-    type: typing.Literal["text"]
+    type: typing.Literal["text"] = "text"
     plain_text: str
     href: typing.Optional[str]
     annotations: Annotations
