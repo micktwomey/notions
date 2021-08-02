@@ -31,5 +31,8 @@ class RichTextText(pydantic.BaseModel):
     annotations: Annotations
     text: Text
 
+    def get_value(self):
+        return self.plain_text
+
 
 RichText = typing.Union[RichTextText]

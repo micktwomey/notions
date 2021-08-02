@@ -9,6 +9,9 @@ class OutputFormats(enum.Enum):
     notion_json = "notion_json"
     notion_jsonl = "notion_jsonl"
     notion_yaml = "notion_yaml"
+    yaml = "yaml"
+    json = "json"
+    jsonl = "jsonl"
 
 
 @dataclasses.dataclass

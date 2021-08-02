@@ -89,6 +89,9 @@ Formats you can specify with `notions --output-format`
 2. `notion_jsonl` - Parses API output and dumps back as JSON, one JSON object per line.
 3. `notion_yaml` - Parses API output and dumps back as YAML, with multiple items in a list.
 4. `text` (default) - Parse API output and return a simple text representation. Handy for looking up page and database ids.
+5. `json` - Parses API output and dumps to a flatter JSON, more suitable for templating and processsing. Multiple items are placed in a list.
+6. `jsonl` - Parses API output and dumps to a flatter JSON, one per line, more suitable for templating and processsing.
+7. `yaml` - Parses API output and dumps to a flatter YAML, more suitable for templating and processsing. Multiple items are placed in a list.
 
 ## Commands
 
@@ -104,8 +107,8 @@ Formats you can specify with `notions --output-format`
 notions api GET /v1/databases/
 
 # Get all databases with pagination and format output as YAML
-# This is the same as `notions --output-format notion_yaml database list`
-notions --output-format notion_yaml api GET /v1/databases/ --paginate
+# This is the same as `notions --output-format yaml database list`
+notions --output-format yaml api GET /v1/databases/ --paginate
 ```
 
 ### notions search
@@ -136,7 +139,7 @@ Get a single page.
 
 ```sh
 # Get a page in YAML
-notions --output-format notion_yaml page get ccad10e7-c776-423e-9662-6ad5fb1256d6
+notions --output-format yaml page get ccad10e7-c776-423e-9662-6ad5fb1256d6
 ```
 
 # API
