@@ -4,6 +4,10 @@ A command line client and API library for [Notion](https://notion.so).
 
 Uses the [Notion API](https://developers.notion.com) to communicate with your Notion pages and databases.
 
+* Homepage: https://github.com/micktwomey/notions
+* Repo: https://github.com/micktwomey/notions
+* PyPI project page: https://pypi.org/project/notions/
+
 - [Notions - A Python Client Library and CLI for Notion](#notions---a-python-client-library-and-cli-for-notion)
 - [Installation](#installation)
   - [pipx for CLI usage anywhere](#pipx-for-cli-usage-anywhere)
@@ -21,6 +25,7 @@ Uses the [Notion API](https://developers.notion.com) to communicate with your No
     - [notions page get](#notions-page-get)
 - [API](#api)
 - [Developing Notions](#developing-notions)
+- [What's the deal with the name?](#whats-the-deal-with-the-name)
 
 # Installation
 
@@ -207,3 +212,7 @@ To develop locally you'll need python 3.6+, [poetry](https://python-poetry.org) 
 You'll need a plan which allows for creating Notion integrations (API access) to develop against Notion, but I'm going to assume you have that if you're interested in this library :D
 
 To release ensure you're happy with the current state of main and run `make release`.
+
+# What's the deal with the name?
+
+"Notions" is sometimes used in Ireland to refer to someone who has ideas abover their station ("so and so has notions"). It's typically Irish and a little bit mean, but often used in an ironic way. I picked it 'cos I thought it'd be funny (and maybe I have notions about writing a client library for a company called Notion).
