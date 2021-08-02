@@ -199,10 +199,11 @@ if __name__ == "__main__":
 
 # Developing Notions
 
-To develop locally:
+To develop locally you'll need python 3.6+, [poetry](https://python-poetry.org) and make:
 
-1. `poetry install` to set up the development environment
-2. `poetry run nox` to test all supported pythons or `poetry run pytest -vv --tb=short` to run tests more directly for your python.
-3. (optional) `poetry run pre-commit install` to install pre-commit hooks.
+1. `make dep` to set up the development environment.
+2. `make test` to test all supported pythons or `make pytest` to run tests more directly for your python.
 
 You'll need a plan which allows for creating Notion integrations (API access) to develop against Notion, but I'm going to assume you have that if you're interested in this library :D
+
+To release ensure you're happy with the current state of main and run `make release`.
