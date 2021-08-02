@@ -12,7 +12,8 @@ jobs:
     strategy:
       max-parallel: 8
       matrix:
-        python-version: [3.8, 3.9, 3.10]
+        # 3.10 hack from https://github.com/actions/setup-python/issues/213
+        python-version: [3.8, 3.9, "3.10.0-alpha - 3.10.99"]
 
     steps:
       - uses: actions/checkout@v2
