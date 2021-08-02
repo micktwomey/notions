@@ -36,6 +36,13 @@ release: check-repo-is-clean
 	gh release create --title $(CURRENT_VERSION) $(CURRENT_VERSION) dist/*
 	poetry publish
 
+.PHONY: bump-prerelease
+bump-prerelease: check-repo-is-clean
+	poetry version prerelease
+	git add -p pyproject.toml
+	git commit -m "Bump pre-release version to $(shell poetry version -s) from $(CURRENT_VERSION)"
+	git push
+
 .PHONY: bump-prepatch
 bump-prepatch: check-repo-is-clean
 	poetry version prepatch
