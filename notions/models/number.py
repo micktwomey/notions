@@ -44,3 +44,6 @@ class NumberFormat(enum.Enum):
 
 class Number(pydantic.BaseModel):
     format: NumberFormat
+
+    def get_value(self):
+        return self.format.value

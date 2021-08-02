@@ -5,6 +5,7 @@ import itertools
 import logging
 import typing
 
+from notions.flatten import flatten_item
 from notions.models.database import Database
 from notions.models.page import Page, PageTitleProperty
 
@@ -40,13 +41,22 @@ def notion_json_format_item(
     output.write("\n")
 
 
-async def notion_json_format_iterable(
+def json_format_item(
+    item: typing.Union[Page, Database],
+    output: typing.TextIO,
+):
+    output.write(flatten_item(item).json())
+    output.write("\n")
+
+
+async def json_format_iterable(
     iterable: typing.AsyncIterable,
     output: typing.TextIO,
+    formatter=lambda item: flatten_item(item).json(),
 ):
     items = []
     async for item in iterable:
-        items.append(item.json())
+        items.append(formatter(item))
     output.write("[\n")
     LOG.info(f"Writing {len(items)} items to {output.name}")
     for item in items[0:-1]:
@@ -54,6 +64,23 @@ async def notion_json_format_iterable(
         output.write(",\n")
     output.write(items[-1])
     output.write("\n]")
+
+
+async def notion_json_format_iterable(
+    iterable: typing.AsyncIterable,
+    output: typing.TextIO,
+):
+    # re-use the json formatter
+    await json_format_iterable(iterable, output, formatter=lambda item: item.json())
+
+
+async def jsonl_format_iterable(
+    iterable: typing.AsyncIterable,
+    output: typing.TextIO,
+):
+    async for item in iterable:
+        output.write(flatten_item(item).json())
+        output.write("\n")
 
 
 async def notion_jsonl_format_iterable(
@@ -72,6 +99,13 @@ def notion_yaml_format_item(
     yaml.dump(item.dict(), output)
 
 
+def yaml_format_item(
+    item: typing.Union[Page, Database],
+    output: typing.TextIO,
+):
+    yaml.dump(flatten_item(item).dict(), output)
+
+
 async def notion_yaml_format_iterable(
     iterable: typing.AsyncIterable,
     output: typing.TextIO,
@@ -79,6 +113,16 @@ async def notion_yaml_format_iterable(
     items = []
     async for item in iterable:
         items.append(item.dict())
+    yaml.dump(items, output)
+
+
+async def yaml_format_iterable(
+    iterable: typing.AsyncIterable,
+    output: typing.TextIO,
+):
+    items = []
+    async for item in iterable:
+        items.append(flatten_item(item).dict())
     yaml.dump(items, output)
 
 
@@ -114,8 +158,16 @@ async def run(
         await notion_jsonl_format_iterable(iterable, output)
     elif output_format == OutputFormats.notion_yaml:
         await notion_yaml_format_iterable(iterable, output)
-    else:
+    elif output_format == OutputFormats.text:
         await text_format_iterable(iterable, output, text_formatter)
+    elif output_format == OutputFormats.json:
+        await json_format_iterable(iterable, output)
+    elif output_format == OutputFormats.jsonl:
+        await jsonl_format_iterable(iterable, output)
+    elif output_format == OutputFormats.yaml:
+        await yaml_format_iterable(iterable, output)
+    else:
+        raise NotImplementedError(f"Unknown output format: {output_format=}")
 
 
 async def run_single_item(
@@ -131,5 +183,13 @@ async def run_single_item(
         notion_json_format_item(item, output)
     elif output_format == OutputFormats.notion_yaml:
         notion_yaml_format_item(item, output)
-    else:
+    elif output_format == OutputFormats.text:
         text_format_item(item, output, text_formatter)
+    elif output_format == OutputFormats.json:
+        json_format_item(item, output)
+    elif output_format == OutputFormats.jsonl:
+        json_format_item(item, output)
+    elif output_format == OutputFormats.yaml:
+        yaml_format_item(item, output)
+    else:
+        raise NotImplementedError(f"Unknown output format: {output_format=}")
