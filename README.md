@@ -20,6 +20,7 @@ Uses the [Notion API](https://developers.notion.com) to communicate with your No
     - [notions database query](#notions-database-query)
     - [notions page get](#notions-page-get)
 - [API](#api)
+- [Developing Notions](#developing-notions)
 
 # Installation
 
@@ -195,3 +196,13 @@ if __name__ == "__main__":
     asyncio.run(main())
 
 ```
+
+# Developing Notions
+
+To develop locally:
+
+1. `poetry install` to set up the development environment
+2. `poetry run nox` to test all supported pythons or `poetry run pytest -vv --tb=short` to run tests more directly for your python.
+3. (optional) `poetry run pre-commit install` to install pre-commit hooks.
+
+You'll need a plan which allows for creating Notion integrations (API access) to develop against Notion, but I'm going to assume you have that if you're interested in this library :D
