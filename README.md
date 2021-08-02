@@ -215,4 +215,4 @@ To release ensure you're happy with the current state of main and run `make rele
 
 # What's the deal with the name?
 
-"Notions" is sometimes used in Ireland to refer to someone who has ideas abover their station ("so and so has notions"). It's typically Irish and a little bit mean, but often used in an ironic way. I picked it 'cos I thought it'd be funny (and maybe I have notions about writing a client library for a company called Notion).
+"Notions" is sometimes used in Ireland to refer to someone who has ideas abover their station ("so and so has notions"). It's typically Irish and a little bit mean, but often used in an ironic way. I picked it 'cos I thought it'd be funny (and maybe I have notions about writing a client library for a product produced by a company called Notion).
