@@ -10,6 +10,7 @@ Uses the [Notion API](https://developers.notion.com) to communicate with your No
 
 - [Notions - A Python Client Library and CLI for Notion](#notions---a-python-client-library-and-cli-for-notion)
 - [Installation](#installation)
+  - [Homebrew for CLI](#homebrew-for-cli)
   - [pipx for CLI usage anywhere](#pipx-for-cli-usage-anywhere)
   - [pip](#pip)
   - [poetry](#poetry)
@@ -28,6 +29,17 @@ Uses the [Notion API](https://developers.notion.com) to communicate with your No
 - [What's the deal with the name?](#whats-the-deal-with-the-name)
 
 # Installation
+
+## Homebrew for CLI
+
+You can use the [notions tap](https://github.com/micktwomey/homebrew-notions) to install:
+
+```sh
+brew tap micktwomey/notions
+brew install notions
+
+# Or in one line: `brew install micktwomey/notions/notions`
+```
 
 ## pipx for CLI usage anywhere
 
