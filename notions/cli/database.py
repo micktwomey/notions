@@ -58,6 +58,7 @@ async def run_query_databases(
         client.query_database(database_id, query),
         output=output,
         output_format=output_format,
+        guess_headers=True,
     )
 
 

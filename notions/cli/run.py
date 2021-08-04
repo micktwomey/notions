@@ -1,5 +1,6 @@
 """Common run function which does the heavy lifting of formatting output"""
 
+import csv
 import enum
 import itertools
 import logging
@@ -145,11 +146,54 @@ def default_text_formatter(item: typing.Union[Database, Page]) -> str:
     return f"{item_type} : {item.id} : {title} : {list(item.properties)}"
 
 
+async def csv_format_iterable(
+    iterable: typing.AsyncIterable,
+    output: typing.TextIO,
+    format: str,
+    guess_headers: bool,
+):
+    writer = csv.writer(output, dialect="excel-tab" if format == "tsv" else "excel")
+    core_headers = ["type", "id", "title", "created_time", "last_edited_time"]
+    first_row = True
+    async for item in iterable:
+        item = flatten_item(item)
+        if first_row:
+            if guess_headers:
+                # TODO: expand and flatten nested objects to property_nested_name
+                property_headers = list(item.properties)
+                headers = core_headers + property_headers
+            else:
+                headers = core_headers
+            writer.writerow(headers)
+            first_row = False
+        row = [item.type, item.id, item.title, item.created_time, item.last_edited_time]
+        if guess_headers:
+            row += [str(item.properties[header].value) for header in property_headers]
+        else:
+            row += [str(prop.value) for prop in item.properties.values()]
+        writer.writerow(row)
+
+
+async def csv_format_item(
+    item: typing.Union[Page, Database],
+    output: typing.TextIO,
+    format: str,
+    guess_headers: bool,
+):
+    async def items():
+        yield item
+
+    await csv_format_iterable(
+        items(), output, format=format, guess_headers=guess_headers
+    )
+
+
 async def run(
     iterable: typing.AsyncIterable,
     output: typing.TextIO,
     output_format: OutputFormats,
     text_formatter: typing.Callable[[typing.Any], str] = default_text_formatter,
+    guess_headers: bool = False,
 ):
     """Helper for commands which handles formatting output"""
     if output_format == OutputFormats.notion_json:
@@ -166,6 +210,10 @@ async def run(
         await jsonl_format_iterable(iterable, output)
     elif output_format == OutputFormats.yaml:
         await yaml_format_iterable(iterable, output)
+    elif output_format == OutputFormats.tsv:
+        await csv_format_iterable(iterable, output, "tsv", guess_headers=guess_headers)
+    elif output_format == OutputFormats.csv:
+        await csv_format_iterable(iterable, output, "csv", guess_headers=guess_headers)
     else:
         raise NotImplementedError(f"Unknown output format: {output_format=}")
 
@@ -175,6 +223,7 @@ async def run_single_item(
     output: typing.TextIO,
     output_format: OutputFormats,
     text_formatter: typing.Callable[[typing.Any], str] = default_text_formatter,
+    guess_headers: bool = False,
 ):
     item = await awaitable
     if output_format == OutputFormats.notion_json:
@@ -191,5 +240,9 @@ async def run_single_item(
         json_format_item(item, output)
     elif output_format == OutputFormats.yaml:
         yaml_format_item(item, output)
+    elif output_format == OutputFormats.tsv:
+        await csv_format_item(item, output, "tsv", guess_headers=guess_headers)
+    elif output_format == OutputFormats.csv:
+        await csv_format_item(item, output, "csv", guess_headers=guess_headers)
     else:
         raise NotImplementedError(f"Unknown output format: {output_format=}")

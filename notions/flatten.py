@@ -43,7 +43,7 @@ class FlatPage(pydantic.BaseModel):
     parent: typing.Any
     parent_type: str
     url: str
-    name: str
+    title: str
 
 
 def keyify(name: str) -> Key:
@@ -73,7 +73,7 @@ def flatten_page(page: notions.models.page.Page) -> FlatPage:
         parent_type=page.parent.type,
         parent=page.parent.get_value(),
         url=page.url,
-        name=properties[Key("name")].value if "name" in properties else "",
+        title=properties[Key("name")].value if "name" in properties else "",
     )
 
 
