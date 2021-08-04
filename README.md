@@ -104,6 +104,8 @@ Formats you can specify with `notions --output-format`
 5. `json` - Parses API output and dumps to a flatter JSON, more suitable for templating and processsing. Multiple items are placed in a list.
 6. `jsonl` - Parses API output and dumps to a flatter JSON, one per line, more suitable for templating and processsing.
 7. `yaml` - Parses API output and dumps to a flatter YAML, more suitable for templating and processsing. Multiple items are placed in a list.
+8. `tsv` - Parses API output and writes out tab separated values.
+9. `csv` - Parses API output and writes out comma separated values.
 
 ## Commands
 

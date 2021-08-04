@@ -12,6 +12,8 @@ class OutputFormats(enum.Enum):
     yaml = "yaml"
     json = "json"
     jsonl = "jsonl"
+    csv = "csv"
+    tsv = "tsv"
 
 
 @dataclasses.dataclass

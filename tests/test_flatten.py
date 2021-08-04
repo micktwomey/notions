@@ -208,7 +208,7 @@ EXAMPLE_FLAT_PAGE = {
     "parent": uuid.UUID("fff51adc-8d4e-414a-a2e3-17e69111c328"),
     "parent_type": "database_id",
     "url": "https://www.notion.so/Fields-filled-in-ccad10e7c776423e96626ad5fb1256d6",
-    "name": "Fields filled in",
+    "title": "Fields filled in",
     "type": "page",
 }
 

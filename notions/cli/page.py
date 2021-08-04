@@ -23,6 +23,7 @@ async def run_get_page(
         client.get_page(page_id=page_id),
         output=output,
         output_format=output_format,
+        guess_headers=True,
     )
 
 
