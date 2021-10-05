@@ -149,9 +149,12 @@ class NotionAsyncClient:
         async for page in self.paginated_request(
             "GET", self.base_url / "v1/databases", pagination_in_json=False
         ):
-            for db in page.results:
-                LOG.debug(f"{db=}")
-                yield db
+            for item in page.iter_results():
+                LOG.debug(f"{item=}")
+                if isinstance(item, Database):
+                    yield item
+                else:
+                    LOG.warning(f"Got unexpected item when querying database: {item=}")
 
     async def create_database(
         self,
