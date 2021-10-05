@@ -1,6 +1,6 @@
 # Notions - A Python Client Library and CLI for Notion
 
-A command line client and API library for [Notion](https://notion.so).
+A command line client and Python client library for [Notion](https://notion.so).
 
 Uses the [Notion API](https://developers.notion.com) to communicate with your Notion pages and databases.
 
@@ -26,6 +26,7 @@ Uses the [Notion API](https://developers.notion.com) to communicate with your No
     - [notions page get](#notions-page-get)
 - [API](#api)
 - [Developing Notions](#developing-notions)
+  - [Testing Against the Real Notion API](#testing-against-the-real-notion-api)
 - [What's the deal with the name?](#whats-the-deal-with-the-name)
 
 # Installation
@@ -219,6 +220,8 @@ if __name__ == "__main__":
 
 ```
 
+There are more examples in [examples/](examples/). You might need to set more environment variables to run them (see below in [Testing Against the Real Notion API](#testing-against-the-real-notion-api) for how to set these up).
+
 # Developing Notions
 
 To develop locally you'll need python 3.6+, [poetry](https://python-poetry.org) and make:
@@ -229,6 +232,24 @@ To develop locally you'll need python 3.6+, [poetry](https://python-poetry.org) 
 You'll need a plan which allows for creating Notion integrations (API access) to develop against Notion, but I'm going to assume you have that if you're interested in this library :D
 
 To release ensure you're happy with the current state of main and run `make release`.
+
+## Testing Against the Real Notion API
+
+All the examples can also run as part of the tests. There is a bit of setup to do this:
+
+1. Create a new top level page in your Notion. Call it something like "notions-test" so you can see it easily.
+2. Make sure you share it with the API integration you previously created (see [Authentication](#authentication) above). Use the "Share" control on the top right of the page to do this.
+3. Get hold of the page's id. One way to do this is to use the "Share" -> "Copy link" to get the link. You can then copy out the ID. e.g. `https://www.notion.so/twomeylee/notions-test-76c28a7477334346807696ce8622a9fc` becomes `76c28a7477334346807696ce8622a9fc` for testing.
+4. Ensure you set the following two environment variables (use a `.env` file or exports in your shell):
+   1. `NOTION_API_KEY` - the API key from the integration you created during [authentication](#authentication).
+   2. `NOTIONS_PARENT_PAGE_UUID` - the ID from the page you created above.
+   3. Optional: `NOTIONS_KEEP_EXAMPLE_PAGES` - set this to anythin to keep any created pages during the examples for inspection later.
+5. When you run `make pytest` it should now run these tests. Alternatively, you can run the examples directly using `python example/the_example.py`.
+
+Unfortunately it's not currently possible to cleanly remove all the detritus from the examples via the API, some cleanup steps are needed:
+
+1. Optional: delete any databases or pages created under the test page ("notions-test" above). You can do this every time you run the tests if you want to keep re-running them.
+2. Delete the test page ("notions-test" above). You will need to create a new page and set the `NOTIONS_PARENT_PAGE_UUID` again to run the examples again.
 
 # What's the deal with the name?
 

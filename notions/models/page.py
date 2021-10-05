@@ -314,3 +314,5 @@ class Page(pydantic.BaseModel):
     properties: PageProperties
     parent: PageParents
     url: str
+    # TODO: icon
+    # TODO: cover

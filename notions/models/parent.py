@@ -5,7 +5,7 @@ import pydantic
 
 
 class PageParent(pydantic.BaseModel):
-    type: typing.Literal["page_id"]
+    type: typing.Literal["page_id"] = "page_id"
     page_id: uuid.UUID
 
     def get_value(self):

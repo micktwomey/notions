@@ -6,17 +6,51 @@ Models for searches, creation and modification.
 import datetime
 import decimal
 import typing
+import uuid
 
 import pydantic
 
 from . import parent
 from .color import Color
-from .database import Properties as DatabaseProperties
+from .number import Number
 from .rich_text import RichText
 
 
+class DatabaseNumberProperty(pydantic.BaseModel):
+    number: Number
+
+
+class DatabaseTitleProperty(pydantic.BaseModel):
+    title: dict = pydantic.Field(default_factory=dict)
+
+
+DatabaseProperty = typing.Union[
+    DatabaseNumberProperty,
+    # SelectProperty,
+    # CreatedTimeProperty,
+    # URLProperty,
+    DatabaseTitleProperty,
+    # RichTextProperty,
+    # DateProperty,
+    # FilesProperty,
+    # PeopleProperty,
+    # CheckboxProperty,
+    # EmailProperty,
+    # PhoneNumberProperty,
+    # MultiSelectProperty,
+    # FormulaProperty,
+    # RollupProperty,
+    # CreatedByProperty,
+    # LastEditedTimeProperty,
+    # LastEditedByProperty,
+    # RelationProperty,
+]
+
+DatabaseProperties = typing.Dict[str, DatabaseProperty]
+
+
 class CreateDatabaseRequest(pydantic.BaseModel):
-    parent: parent.DatabaseParents
+    parent: parent.PageParent
     title: typing.List[RichText]
     properties: DatabaseProperties
 
@@ -60,10 +94,23 @@ PageCreationProperties = typing.Union[
 ]
 
 
+class CreatePageDatabaseParent(pydantic.BaseModel):
+    database_id: uuid.UUID
+
+
+class CreatePagePageParent(pydantic.BaseModel):
+    page_id: uuid.UUID
+
+
+CreatePageParents = typing.Union[CreatePageDatabaseParent]
+
+
 class CreatePageRequest(pydantic.BaseModel):
-    parent: parent.PageParents
+    parent: CreatePageParents
     properties: typing.Dict[str, PageCreationProperties]
     children: list  # TODO: define block types
+    # TODO: icon
+    # TODO: cover
 
 
 class QueryDatabaseSort(pydantic.BaseModel):

@@ -6,3 +6,5 @@ from .page import PageProperties
 class UpdatePageRequest(pydantic.BaseModel):
     properties: PageProperties
     archived: bool = False
+    # TODO: icon
+    # TODO: cover

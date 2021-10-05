@@ -28,7 +28,7 @@ class NotionAsyncClient:
         self,
         api_token: str,
         base_url="https://api.notion.com/",
-        notion_version="2021-05-13",
+        notion_version="2021-08-16",
     ):
         self.api_token = api_token
         self.base_url = furl.furl(base_url)
@@ -67,7 +67,11 @@ class NotionAsyncClient:
         async with self.async_client() as client:
             response = await client.request(method, url.url, json=json, *args, **kwargs)
             if raise_for_status:
-                response.raise_for_status()
+                try:
+                    response.raise_for_status()
+                except Exception:
+                    LOG.exception(f"{response.content=}")
+                    raise
             return response
 
     async def paginated_request(
@@ -103,7 +107,11 @@ class NotionAsyncClient:
                 )
                 LOG.debug(f"{response.content=}")
                 if raise_for_status:
-                    response.raise_for_status()
+                    try:
+                        response.raise_for_status()
+                    except Exception:
+                        LOG.exception(f"{response.content=}")
+                        raise
                 page = PaginatedListResponse.parse_raw(response.content)
                 yield page
                 has_more = page.has_more
@@ -111,7 +119,10 @@ class NotionAsyncClient:
 
     async def get_database(self, database_id: uuid.UUID) -> Database:
         """https://developers.notion.com/reference/get-database"""
-        raise NotImplementedError()
+        response = await self.request(
+            "GET", self.get_url_for_path("v1/databases", str(database_id))
+        )
+        return Database.parse_raw(response.content)
 
     async def query_database(
         self, database_id: uuid.UUID, query: QueryDatabaseRequest
@@ -123,9 +134,12 @@ class NotionAsyncClient:
             data=query.json(exclude_unset=True),
             pagination_in_json=True,
         ):
-            for item in page.results:
+            for item in page.iter_results():
                 LOG.debug(f"{item=}")
-                yield item
+                if isinstance(item, Page):
+                    yield item
+                else:
+                    LOG.warning(f"Got unexpected item when querying database: {item=}")
 
     async def list_databases(self) -> typing.AsyncIterable[Database]:
         """Performs a GET /databases
@@ -141,10 +155,15 @@ class NotionAsyncClient:
 
     async def create_database(
         self,
-        database: CreateDatabaseRequest,
+        create_database_request: CreateDatabaseRequest,
     ) -> Database:
         """https://developers.notion.com/reference/create-a-database"""
-        raise NotImplementedError()
+        response = await self.request(
+            "POST",
+            self.get_url_for_path("v1/databases"),
+            data=create_database_request.json(),
+        )
+        return Database.parse_raw(response.content)
 
     async def get_page(self, page_id: uuid.UUID) -> Page:
         """https://developers.notion.com/reference/get-page"""
@@ -153,13 +172,25 @@ class NotionAsyncClient:
         )
         return Page.parse_raw(response.content)
 
-    async def create_page(self, page: CreatePageRequest) -> Page:
+    async def create_page(self, create_page_request: CreatePageRequest) -> Page:
         """https://developers.notion.com/reference/post-page"""
-        raise NotImplementedError()
+        response = await self.request(
+            "POST",
+            self.get_url_for_path("v1/pages"),
+            data=create_page_request.json(),
+        )
+        return Page.parse_raw(response.content)
 
-    async def update_page(self, page_id: uuid.UUID, page: UpdatePageRequest) -> Page:
+    async def update_page(
+        self, page_id: uuid.UUID, update_page_request: UpdatePageRequest
+    ) -> Page:
         """https://developers.notion.com/reference/patch-page"""
-        raise NotImplementedError()
+        response = await self.request(
+            "PATCH",
+            self.get_url_for_path("v1/pages", str(page_id)),
+            data=update_page_request.json(),
+        )
+        return Page.parse_raw(response.content)
 
     async def get_block_children(self, block_id: uuid.UUID):
         """https://developers.notion.com/reference/get-block-children"""
@@ -179,7 +210,9 @@ class NotionAsyncClient:
         """https://developers.notion.com/reference/get-users"""
         raise NotImplementedError()
 
-    async def search(self, search_request: SearchRequest):
+    async def search(
+        self, search_request: SearchRequest
+    ) -> typing.AsyncIterable[typing.Union[Database, Page]]:
         """https://developers.notion.com/reference/post-search"""
         async for page in self.paginated_request(
             "POST",
@@ -187,6 +220,6 @@ class NotionAsyncClient:
             data=search_request.json(exclude_unset=True, exclude_none=True),
             pagination_in_json=True,
         ):
-            for item in page.results:
+            for item in page.iter_results():
                 LOG.debug(f"{item=}")
                 yield item
