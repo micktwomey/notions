@@ -7,7 +7,9 @@ class DatabaseCheckboxProperty(pydantic.BaseModel):
     id: str
     name: str
     type: typing.Literal["checkbox"] = "checkbox"
-    checkbox: dict = pydantic.Field(default_factory=dict)
+    checkbox: dict = pydantic.Field(
+        default_factory=dict
+    )  # TODO: flesh out checkbox properties
 
     def get_value(self):
         return self.checkbox

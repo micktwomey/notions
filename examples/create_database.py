@@ -27,7 +27,7 @@ async def create_database(
     client: NotionAsyncClient, parent_page_id: uuid.UUID
 ) -> Database:
     database_name = f"notions-test {datetime.utcnow().isoformat(' ')}"
-    LOG.info(f"Creating databsae {database_name}")
+    LOG.info(f"Creating database {database_name}")
     create_database_request = CreateDatabase(
         parent=PageParent(page_id=parent_page_id),
         title=[
