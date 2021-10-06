@@ -1,3 +1,7 @@
+"""The different responses the API will give back
+
+"""
+
 import typing
 
 import pydantic
@@ -7,7 +11,38 @@ from .page import Page
 
 
 class NotionAPIResponse(pydantic.BaseModel):
+    """Notion API will always return a JSON object with an object property"""
+
     object: str
+    obj: typing.Any
+
+    @property
+    def is_error(self):
+        return self.object == "error"
+
+    def get_error_response(self) -> "ErrorResponse":
+        return ErrorResponse.parse_obj(self.obj)
+
+    @property
+    def is_list(self):
+        return self.object == "list"
+
+    def get_paginated_list_response(self) -> "PaginatedListResponse":
+        return PaginatedListResponse.parse_obj(self.obj)
+
+    @property
+    def is_database(self):
+        return self.object == "database"
+
+    def get_database(self) -> Database:
+        return Database.parse_obj(self.obj)
+
+    @property
+    def is_page(self):
+        return self.object == "page"
+
+    def get_page(self) -> Page:
+        return Page.parse_obj(self.obj)
 
 
 class ErrorResponse(pydantic.BaseModel):

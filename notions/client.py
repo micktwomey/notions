@@ -7,18 +7,34 @@ import uuid
 import furl
 import httpx
 
-from .models.database import Database
-from .models.page import Page
-from .models.request import (
-    CreateDatabaseRequest,
-    CreatePageRequest,
-    QueryDatabaseRequest,
-    SearchRequest,
-)
-from .models.response import PaginatedListResponse
-from .models.update import UpdatePageRequest
+from .models.database import CreateDatabase, Database
+from .models.page import CreatePage, Page, UpdatePage
+from .models.query_database import QueryDatabase
+from .models.response import NotionAPIResponse, PaginatedListResponse
+from .models.search import Search
 
 LOG = logging.getLogger(__name__)
+
+
+class NotionAPIResponseError(Exception):
+    def __init__(
+        self,
+        message: str,
+        response: typing.Optional[httpx.Response] = None,
+        notion_api_response: typing.Optional[NotionAPIResponse] = None,
+    ):
+        self.message = message
+        self.response = response
+        self.notion_api_response = notion_api_response
+        super().__init__(message, response, notion_api_response)
+
+    @property
+    def has_response(self):
+        return self.response is not None
+
+    @property
+    def has_notion_api_response(self):
+        return self.notion_api_response is not None
 
 
 class NotionAsyncClient:
@@ -53,79 +69,87 @@ class NotionAsyncClient:
         ) as httpx_client:
             yield httpx_client
 
-    async def request(
+    async def api_request(
         self,
         method: str,
         url: furl.furl,
-        raise_for_status=True,
         json: typing.Any = None,
-        *args,
-        **kwargs,
-    ):
+        *args: typing.Any,
+        **kwargs: typing.Any,
+    ) -> NotionAPIResponse:
         """Perform a HTTP request"""
         LOG.debug(f"request: {method=} {url=} {json=}")
         async with self.async_client() as client:
-            response = await client.request(method, url.url, json=json, *args, **kwargs)
-            if raise_for_status:
-                try:
-                    response.raise_for_status()
-                except Exception:
-                    LOG.exception(f"{response.content=}")
-                    raise
-            return response
+            try:
+                response = await client.request(
+                    method, url.url, json=json, *args, **kwargs
+                )
+            except Exception as e:
+                raise NotionAPIResponseError(f"Error making request: {e}") from e
+            try:
+                obj = response.json()
+                notion_response = NotionAPIResponse(object=obj["object"], obj=obj)
+            except Exception as e:
+                raise NotionAPIResponseError(
+                    f"Unable to parse response: {e}", response=response
+                ) from e
+
+            if response.status_code != 200:
+                raise NotionAPIResponseError(
+                    f"Non HTTP 200 response: {response.status_code}",
+                    response=response,
+                    notion_api_response=notion_response,
+                )
+            return notion_response
 
     async def paginated_request(
         self,
         method: str,
         url: furl.furl,
         pagination_in_json: bool,
-        raise_for_status=True,
         data: str = None,
-        *args,
-        **kwargs,
+        *args: typing.Any,
+        **kwargs: typing.Any,
     ):
         """Perform a httpx request, yielding pages"""
-        url = url.copy()
+        url = url.copy()  # make sure we don't modify the original
         has_more = True
         start_cursor = None
-        async with self.async_client() as client:
-            while has_more:
-                if start_cursor is not None:
-                    # start_cursor is set either in the json body or the query params, depending on the request
-                    if pagination_in_json:
-                        LOG.debug(f"Setting {start_cursor=} in JSON body")
-                        # Since the data is already encoded by pydantic, load, update and re-encode it
-                        request_json = json.loads(data)
-                        request_json["start_cursor"] = start_cursor
-                        data = json.dumps(request_json)
-                    else:
-                        LOG.debug(f"Setting {start_cursor=} in url params")
-                        url.set({"start_cursor": start_cursor})
-                LOG.debug(f"paginated_request: {method=} {url=} {data=}")
-                response = await client.request(
-                    method, url.url, data=data, *args, **kwargs
-                )
-                LOG.debug(f"{response.content=}")
-                if raise_for_status:
-                    try:
-                        response.raise_for_status()
-                    except Exception:
-                        LOG.exception(f"{response.content=}")
-                        raise
-                page = PaginatedListResponse.parse_raw(response.content)
-                yield page
-                has_more = page.has_more
-                start_cursor = page.next_cursor
+        while has_more:
+            if start_cursor is not None:
+                # start_cursor is set either in the json body or the query params, depending on the request
+                if pagination_in_json:
+                    LOG.debug(f"Setting {start_cursor=} in JSON body")
+                    # Since the data is already encoded by pydantic, load, update and re-encode it
+                    request_json = json.loads(data)
+                    request_json["start_cursor"] = start_cursor
+                    data = json.dumps(request_json)
+                else:
+                    LOG.debug(f"Setting {start_cursor=} in url params")
+                    url.set({"start_cursor": start_cursor})
+            LOG.debug(f"paginated_request: {method=} {url=} {data=}")
+            notion_response = await self.api_request(
+                method,
+                url,
+                data=data,
+                *args,
+                **kwargs,
+            )
+            LOG.debug(f"{notion_response=}")
+            page = notion_response.get_paginated_list_response()
+            yield page
+            has_more = page.has_more
+            start_cursor = page.next_cursor
 
     async def get_database(self, database_id: uuid.UUID) -> Database:
         """https://developers.notion.com/reference/get-database"""
-        response = await self.request(
+        response = await self.api_request(
             "GET", self.get_url_for_path("v1/databases", str(database_id))
         )
-        return Database.parse_raw(response.content)
+        return response.get_database()
 
     async def query_database(
-        self, database_id: uuid.UUID, query: QueryDatabaseRequest
+        self, database_id: uuid.UUID, query: QueryDatabase
     ) -> typing.AsyncIterable[Page]:
         """https://developers.notion.com/reference/post-database-query"""
         async for page in self.paginated_request(
@@ -158,42 +182,40 @@ class NotionAsyncClient:
 
     async def create_database(
         self,
-        create_database_request: CreateDatabaseRequest,
+        create_database: CreateDatabase,
     ) -> Database:
         """https://developers.notion.com/reference/create-a-database"""
-        response = await self.request(
+        response = await self.api_request(
             "POST",
             self.get_url_for_path("v1/databases"),
-            data=create_database_request.json(),
+            data=create_database.json(),
         )
-        return Database.parse_raw(response.content)
+        return response.get_database()
 
     async def get_page(self, page_id: uuid.UUID) -> Page:
         """https://developers.notion.com/reference/get-page"""
-        response = await self.request(
+        response = await self.api_request(
             "GET", self.get_url_for_path("v1/pages", str(page_id))
         )
-        return Page.parse_raw(response.content)
+        return response.get_page()
 
-    async def create_page(self, create_page_request: CreatePageRequest) -> Page:
+    async def create_page(self, create_page: CreatePage) -> Page:
         """https://developers.notion.com/reference/post-page"""
-        response = await self.request(
+        response = await self.api_request(
             "POST",
             self.get_url_for_path("v1/pages"),
-            data=create_page_request.json(),
+            data=create_page.json(),
         )
-        return Page.parse_raw(response.content)
+        return response.get_page()
 
-    async def update_page(
-        self, page_id: uuid.UUID, update_page_request: UpdatePageRequest
-    ) -> Page:
+    async def update_page(self, page_id: uuid.UUID, update_page: UpdatePage) -> Page:
         """https://developers.notion.com/reference/patch-page"""
-        response = await self.request(
+        response = await self.api_request(
             "PATCH",
             self.get_url_for_path("v1/pages", str(page_id)),
-            data=update_page_request.json(),
+            data=update_page.json(),
         )
-        return Page.parse_raw(response.content)
+        return response.get_page()
 
     async def get_block_children(self, block_id: uuid.UUID):
         """https://developers.notion.com/reference/get-block-children"""
@@ -214,13 +236,13 @@ class NotionAsyncClient:
         raise NotImplementedError()
 
     async def search(
-        self, search_request: SearchRequest
+        self, search: Search
     ) -> typing.AsyncIterable[typing.Union[Database, Page]]:
         """https://developers.notion.com/reference/post-search"""
         async for page in self.paginated_request(
             "POST",
             self.base_url / "v1/search",
-            data=search_request.json(exclude_unset=True, exclude_none=True),
+            data=search.json(exclude_unset=True, exclude_none=True),
             pagination_in_json=True,
         ):
             for item in page.iter_results():
