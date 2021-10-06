@@ -4,16 +4,10 @@ import json
 import uuid
 
 from notions.models.color import Color
-from notions.models.page import (
-    ArrayRollup,
-    BooleanFormula,
-    DateFormula,
-    DateRange,
-    DateRollup,
-    MultiSelectOption,
-    NumberFormula,
-    NumberRollup,
-    Page,
+from notions.models.date import DateRange
+from notions.models.page import Page
+from notions.models.parent import DatabaseParent
+from notions.models.properties import (
     PageCheckboxProperty,
     PageCreatedByProperty,
     PageCreatedTimeProperty,
@@ -33,12 +27,22 @@ from notions.models.page import (
     PageSelectProperty,
     PageTitleProperty,
     PageURLProperty,
-    Relation,
-    SelectOption,
-    StringFormula,
 )
-from notions.models.parent import DatabaseParent
-from notions.models.rich_text import Annotations, RichText, RichTextText, Text
+from notions.models.properties.formula import (
+    PageBooleanFormula,
+    PageDateFormula,
+    PageNumberFormula,
+    PageStringFormula,
+)
+from notions.models.properties.multi_select import PageMultiSelectOption
+from notions.models.properties.relation import PageRelation
+from notions.models.properties.rollup import (
+    PageArrayRollup,
+    PageDateRollup,
+    PageNumberRollup,
+)
+from notions.models.properties.select import PageSelectOption
+from notions.models.rich_text import Annotations, RichText, Text
 from notions.models.user import Person, PersonDetails
 
 # Note: I've modified the JSON to format time zones using +00:00 instead of Z.
@@ -325,7 +329,7 @@ def test_parse_page():
             archived=False,
             properties={
                 "Boolean Formula Property": PageFormulaProperty(
-                    id="::TX", formula=BooleanFormula(boolean=True)
+                    id="::TX", formula=PageBooleanFormula(boolean=True)
                 ),
                 "Phone property": PagePhoneNumberProperty(
                     id=":Cyi", phone_number="+555 1234"
@@ -363,12 +367,12 @@ def test_parse_page():
                 "Muti-select property": PageMultiSelectProperty(
                     id="TrTf",
                     multi_select=[
-                        MultiSelectOption(
+                        PageMultiSelectOption(
                             id=uuid.UUID("9eea7e74-5ba3-42fc-9aa3-2a8cfce1a65c"),
                             name="foo",
                             color=Color.gray,
                         ),
-                        MultiSelectOption(
+                        PageMultiSelectOption(
                             id=uuid.UUID("576a716b-c31c-4450-be9d-b804b39654e1"),
                             name="bar",
                             color=Color.brown,
@@ -378,11 +382,13 @@ def test_parse_page():
                 "Relation Property": PageRelationProperty(
                     id="_GWY",
                     relation=[
-                        Relation(id=uuid.UUID("ccad10e7-c776-423e-9662-6ad5fb1256d6"))
+                        PageRelation(
+                            id=uuid.UUID("ccad10e7-c776-423e-9662-6ad5fb1256d6")
+                        )
                     ],
                 ),
                 "Number Rollup property": PageRollupProperty(
-                    id="`<GE", rollup=NumberRollup(number=decimal.Decimal("5.23"))
+                    id="`<GE", rollup=PageNumberRollup(number=decimal.Decimal("5.23"))
                 ),
                 "File property": PageFilesProperty(
                     id="dVLG", files=[{"name": "p8logo.png"}]
@@ -392,7 +398,7 @@ def test_parse_page():
                 ),
                 "Date Rollup property": PageRollupProperty(
                     id="fm]d",
-                    rollup=DateRollup(
+                    rollup=PageDateRollup(
                         date=DateRange(
                             start=datetime.datetime(
                                 2021, 7, 15, 0, 0, tzinfo=datetime.timezone.utc
@@ -437,14 +443,14 @@ def test_parse_page():
                     ),
                 ),
                 "String Formula Property": PageFormulaProperty(
-                    id="n`}C", formula=StringFormula(string="July 31 2021, 23:46")
+                    id="n`}C", formula=PageStringFormula(string="July 31 2021, 23:46")
                 ),
                 "Number Formula property": PageFormulaProperty(
-                    id="oNn>", formula=NumberFormula(number=decimal.Decimal("6.23"))
+                    id="oNn>", formula=PageNumberFormula(number=decimal.Decimal("6.23"))
                 ),
                 "Date Formula Property": PageFormulaProperty(
                     id="oyUS",
-                    formula=DateFormula(
+                    formula=PageDateFormula(
                         date=DateRange(
                             start=datetime.datetime(
                                 2021, 7, 31, 23, 46, tzinfo=datetime.timezone.utc
@@ -454,7 +460,7 @@ def test_parse_page():
                 ),
                 "Email rollup property": PageRollupProperty(
                     id="viJS",
-                    rollup=ArrayRollup(
+                    rollup=PageArrayRollup(
                         array=[{"type": "email", "email": "test@example.com"}]
                     ),
                 ),
@@ -466,7 +472,7 @@ def test_parse_page():
                 ),
                 "Select property": PageSelectProperty(
                     id="}XVI",
-                    select=SelectOption(
+                    select=PageSelectOption(
                         id=uuid.UUID("6492d7c0-0245-4052-b410-aecc6f882ead"),
                         name="foo",
                         color=Color.gray,

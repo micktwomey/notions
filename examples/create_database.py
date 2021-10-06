@@ -12,22 +12,13 @@ from datetime import datetime
 from decimal import Decimal
 
 from notions.client import NotionAsyncClient
+from notions.models import properties
 from notions.models.color import Color
-from notions.models.database import Database
+from notions.models.database import CreateDatabase, Database
 from notions.models.number import Number, NumberFormat
-from notions.models.page import Page
+from notions.models.page import CreatePage, CreatePageDatabaseParent, Page, UpdatePage
 from notions.models.parent import PageParent
-from notions.models.request import (
-    CreateDatabaseRequest,
-    CreatePageDatabaseParent,
-    CreatePageRequest,
-    DatabaseNumberProperty,
-    DatabaseTitleProperty,
-    PageNumberProperty,
-    PageTitleProperty,
-)
 from notions.models.rich_text import Annotations, RichTextText, Text
-from notions.models.update import UpdatePageRequest
 
 LOG = logging.getLogger(__name__)
 
@@ -37,7 +28,7 @@ async def create_database(
 ) -> Database:
     database_name = f"notions-test {datetime.utcnow().isoformat(' ')}"
     LOG.info(f"Creating databsae {database_name}")
-    create_database_request = CreateDatabaseRequest(
+    create_database_request = CreateDatabase(
         parent=PageParent(page_id=parent_page_id),
         title=[
             RichTextText(
@@ -54,8 +45,10 @@ async def create_database(
             )
         ],
         properties={
-            "number": DatabaseNumberProperty(number=Number(format=NumberFormat.number)),
-            "Name": DatabaseTitleProperty(),
+            "number": properties.CreateDatabaseNumberProperty(
+                number=Number(format=NumberFormat.number)
+            ),
+            "Name": properties.CreateDatabaseTitleProperty(),
         },
     )
     LOG.info(f"Sending request:\n{create_database_request.json(indent=2)}")
@@ -65,11 +58,11 @@ async def create_database(
 
 
 async def create_page(client: NotionAsyncClient, database_id: uuid.UUID) -> Page:
-    create_page_request = CreatePageRequest(
+    create_page_request = CreatePage(
         parent=CreatePageDatabaseParent(database_id=database_id),
         children=[],
         properties={
-            "Name": PageTitleProperty(
+            "Name": properties.CreatePageTitleProperty(
                 title=[
                     RichTextText(
                         plain_text="test-page",
@@ -85,7 +78,7 @@ async def create_page(client: NotionAsyncClient, database_id: uuid.UUID) -> Page
                     )
                 ]
             ),
-            "number": PageNumberProperty(number=Decimal("1.23")),
+            "number": properties.CreatePageNumberProperty(number=Decimal("1.23")),
         },
     )
     LOG.info(f"Sending request:\n{create_page_request.json(indent=2)}")
@@ -130,9 +123,7 @@ async def main():
     if os.environ.get("NOTIONS_KEEP_EXAMPLE_PAGES"):
         LOG.info("NOTIONS_KEEP_EXAMPLE_PAGES set, keeping pages")
     else:
-        update_page_request = UpdatePageRequest(
-            archived=True, properties=page.properties
-        )
+        update_page_request = UpdatePage(archived=True, properties=page.properties)
         LOG.info(f"Sending page update request:\n{update_page_request.json(indent=2)}")
         LOG.info(f"Deleting (archiving) page {page.id=}")
         await notion_client.update_page(page.id, update_page_request)

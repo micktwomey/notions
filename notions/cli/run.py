@@ -8,7 +8,8 @@ import typing
 
 from notions.flatten import flatten_item
 from notions.models.database import Database
-from notions.models.page import Page, PageTitleProperty
+from notions.models.page import Page
+from notions.models.properties import PageTitleProperty
 
 from . import yaml
 from .config import OutputFormats
