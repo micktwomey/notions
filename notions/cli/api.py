@@ -35,5 +35,5 @@ async def run_api(
         )
     else:
         async with client.async_client() as async_client:
-            response = await async_client.request(method, url)
+            response = await async_client.request(method, url.tostr())
             output.write(response.content.decode("UTF-8"))

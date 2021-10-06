@@ -6,7 +6,6 @@ import coloredlogs
 import typer
 
 from notions.client import NotionAsyncClient
-from notions.models.request import SearchRequest
 
 from . import database, page
 from .api import run_api
