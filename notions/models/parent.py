@@ -31,4 +31,4 @@ class DatabaseParent(pydantic.BaseModel):
 # Each content type has slightly different valid parents
 AllParents = typing.Union[PageParent, WorkspaceParent, DatabaseParent]
 DatabaseParents = typing.Union[PageParent, WorkspaceParent]
-PageParents = typing.Union[PageParent, DatabaseParent]
+PageParents = typing.Union[PageParent, DatabaseParent, WorkspaceParent]

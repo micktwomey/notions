@@ -14,7 +14,7 @@ from .created_time import (
 )
 from .date import DatabaseDateProperty, PageDateProperty
 from .email import DatabaseEmailProperty, PageEmailProperty
-from .files import DatabaseFilesProperty, PageFilesProperty
+from .file import DatabaseFileProperty, PageFileProperty
 from .formula import DatabaseFormulaProperty, PageFormulaProperty
 from .last_edited_by import DatabaseLastEditedByProperty, PageLastEditedByProperty
 from .last_edited_time import DatabaseLastEditedTimeProperty, PageLastEditedTimeProperty
@@ -45,7 +45,7 @@ DatabaseProperty = typing.Union[
     DatabaseCreatedTimeProperty,
     DatabaseDateProperty,
     DatabaseEmailProperty,
-    DatabaseFilesProperty,
+    DatabaseFileProperty,
     DatabaseFormulaProperty,
     DatabaseLastEditedByProperty,
     DatabaseLastEditedTimeProperty,
@@ -71,7 +71,7 @@ CreateDatabaseProperty = typing.Union[
     CreateDatabaseTitleProperty,
     # TODO: CreateDatabaseRichTextProperty,
     # TODO: CreateDatabaseDateProperty,
-    # TODO: CreateDatabaseFilesProperty,
+    # TODO: CreateDatabaseFileProperty,
     # TODO: CreateDatabasePeopleProperty,
     # TODO: CreateDatabaseCheckboxProperty,
     # TODO: CreateDatabaseEmailProperty,
@@ -93,7 +93,7 @@ PageProperty = typing.Union[
     PageCreatedTimeProperty,
     PageDateProperty,
     PageEmailProperty,
-    PageFilesProperty,
+    PageFileProperty,
     PageFormulaProperty,
     PageLastEditedByProperty,
     PageLastEditedTimeProperty,
@@ -119,7 +119,7 @@ CreatePageProperty = typing.Union[
     CreatePageTitleProperty,
     # TODO: CreatePageRichTextProperty,
     # TODO: CreatePageDateProperty,
-    # TODO: CreatePageFilesProperty,
+    # TODO: CreatePageFileProperty,
     # TODO: CreatePagePeopleProperty,
     # TODO: CreatePageCheckboxProperty,
     # TODO: CreatePageEmailProperty,
@@ -143,7 +143,7 @@ __all__ = [
     "DatabaseCreatedTimeProperty",
     "DatabaseDateProperty",
     "DatabaseEmailProperty",
-    "DatabaseFilesProperty",
+    "DatabaseFileProperty",
     "DatabaseFormulaProperty",
     "DatabaseLastEditedByProperty",
     "DatabaseLastEditedTimeProperty",
@@ -166,7 +166,7 @@ __all__ = [
     "CreateDatabaseTitleProperty",
     # TODO: CreateDatabaseRichTextProperty,
     # TODO: CreateDatabaseDateProperty,
-    # TODO: CreateDatabaseFilesProperty,
+    # TODO: CreateDatabaseFileProperty,
     # TODO: CreateDatabasePeopleProperty,
     # TODO: CreateDatabaseCheckboxProperty,
     # TODO: CreateDatabaseEmailProperty,
@@ -185,7 +185,7 @@ __all__ = [
     "PageCreatedTimeProperty",
     "PageDateProperty",
     "PageEmailProperty",
-    "PageFilesProperty",
+    "PageFileProperty",
     "PageFormulaProperty",
     "PageLastEditedByProperty",
     "PageLastEditedTimeProperty",
@@ -208,7 +208,7 @@ __all__ = [
     "CreatePageTitleProperty",
     # TODO: CreatePageRichTextProperty,
     # TODO: CreatePageDateProperty,
-    # TODO: CreatePageFilesProperty,
+    # TODO: CreatePageFileProperty,
     # TODO: CreatePagePeopleProperty,
     # TODO: CreatePageCheckboxProperty,
     # TODO: CreatePageEmailProperty,

@@ -7,6 +7,7 @@ import logging
 import typing
 
 from notions.flatten import flatten_item
+from notions.models import properties
 from notions.models.database import Database
 from notions.models.page import Page
 from notions.models.properties import PageTitleProperty
@@ -136,10 +137,10 @@ def default_text_formatter(item: typing.Union[Database, Page]) -> str:
         item_type = "database"
     else:
         item_type = "page"
-        if "Name" in item.properties and isinstance(
-            item.properties["Name"], PageTitleProperty
-        ):
-            title_property = item.properties["Name"].title
+        title_property = []
+        for page_prop in item.properties.values():
+            if isinstance(page_prop, PageTitleProperty):
+                title_property = page_prop.title
 
     titles = [t.plain_text for t in title_property]
     if titles:

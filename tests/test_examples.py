@@ -12,16 +12,19 @@ import sys
 
 import pytest
 
-pytestmark = pytest.mark.skipif(
-    (
-        "NOTION_API_KEY" not in os.environ
-        or "NOTIONS_PARENT_PAGE_UUID" not in os.environ
+pytestmark = [
+    pytest.mark.skipif(
+        (
+            "NOTION_API_KEY" not in os.environ
+            or "NOTIONS_PARENT_PAGE_UUID" not in os.environ
+        ),
+        reason=(
+            "Missing environment keys to test notions client against real api. "
+            "Looking for NOTION_API_KEY and NOTIONS_PARENT_PAGE_UUID."
+        ),
     ),
-    reason=(
-        "Missing environment keys to test notions client against real api. "
-        "Looking for NOTION_API_KEY and NOTIONS_PARENT_PAGE_UUID."
-    ),
-)
+    pytest.mark.slow,
+]
 
 # Assuming examples are in a sibling folder to this `tests` folder
 EXAMPLES_PATH = pathlib.Path(__file__).parent / "../examples"

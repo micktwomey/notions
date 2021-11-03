@@ -19,7 +19,7 @@ class DatabaseDateProperty(pydantic.BaseModel):
 class PageDateProperty(pydantic.BaseModel):
     id: str
     type: typing.Literal["date"] = "date"
-    date: DateRange
+    date: typing.Optional[DateRange]
 
     def get_value(self):
         return self.date

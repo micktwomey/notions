@@ -16,7 +16,7 @@ class DatabaseEmailProperty(pydantic.BaseModel):
 class PageEmailProperty(pydantic.BaseModel):
     id: str
     type: typing.Literal["email"] = "email"
-    email: str
+    email: typing.Optional[str]
 
     def get_value(self):
         return self.email

@@ -23,7 +23,7 @@ class CreateDatabaseNumberProperty(pydantic.BaseModel):
 class PageNumberProperty(pydantic.BaseModel):
     id: str
     type: typing.Literal["number"] = "number"
-    number: decimal.Decimal
+    number: typing.Optional[decimal.Decimal]
 
     def get_value(self):
         return self.number

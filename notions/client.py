@@ -58,14 +58,18 @@ class NotionAsyncClient:
         return url
 
     @contextlib.asynccontextmanager
-    async def async_client(self):
+    async def async_client(self, timeout: typing.Optional[httpx.Timeout] = None):
         """Context manager giving a httpx.AsyncClient set up for requests"""
+        if timeout is None:
+            timeout = httpx.Timeout(30.0, connect=5.0)
+        LOG.debug(f"Using httpx timeout {timeout}")
         async with httpx.AsyncClient(
             headers={
                 "Authorization": f"Bearer {self.api_token}",
                 "Notion-Version": self.notion_version,
                 "Content-Type": "application/json",
             },
+            timeout=timeout,
         ) as httpx_client:
             yield httpx_client
 

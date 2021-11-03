@@ -4,6 +4,8 @@ import uuid
 
 import pydantic
 
+from .emoji import Emoji
+from .file import PageCover
 from .parent import PageParents
 from .properties import CreatePageProperties, PageProperties
 
@@ -17,8 +19,8 @@ class Page(pydantic.BaseModel):
     properties: PageProperties
     parent: PageParents
     url: str
-    # TODO: icon
-    # TODO: cover
+    icon: typing.Optional[Emoji]
+    cover: typing.Optional[PageCover]
 
 
 class CreatePageDatabaseParent(pydantic.BaseModel):
@@ -36,12 +38,12 @@ class CreatePage(pydantic.BaseModel):
     parent: CreatePageParents
     properties: CreatePageProperties
     children: list  # TODO: define block types
-    # TODO: icon
-    # TODO: cover
+    icon: typing.Optional[Emoji]
+    cover: typing.Optional[PageCover]
 
 
 class UpdatePage(pydantic.BaseModel):
     properties: PageProperties
     archived: bool = False
-    # TODO: icon
-    # TODO: cover
+    icon: typing.Optional[Emoji]
+    cover: typing.Optional[PageCover]
