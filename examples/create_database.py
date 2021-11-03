@@ -1,4 +1,4 @@
-"""Example showing creating a database with all fields, inserting a page and retrieving
+"""Example showing creating a database with all fields.
 
 This is a fairly verbose example, using all the request and response models.
 """
@@ -57,36 +57,6 @@ async def create_database(
     return database
 
 
-async def create_page(client: NotionAsyncClient, database_id: uuid.UUID) -> Page:
-    create_page_request = CreatePage(
-        parent=CreatePageDatabaseParent(database_id=database_id),
-        children=[],
-        properties={
-            "Name": properties.CreatePageTitleProperty(
-                title=[
-                    RichTextText(
-                        plain_text="test-page",
-                        text=Text(content="test-page"),
-                        annotations=Annotations(
-                            bold=False,
-                            italic=False,
-                            strikethrough=False,
-                            underline=False,
-                            code=False,
-                            color=Color.default,
-                        ),
-                    )
-                ]
-            ),
-            "number": properties.CreatePageNumberProperty(number=Decimal("1.23")),
-        },
-    )
-    LOG.info(f"Sending request:\n{create_page_request.json(indent=2)}")
-    page = await client.create_page(create_page_request)
-    LOG.info(f"Got {page=} back")
-    return page
-
-
 async def main():
     try:
         import coloredlogs
@@ -109,25 +79,9 @@ async def main():
     else:
         LOG.info("Retrieved database looks like one we created!")
 
-    page = await create_page(notion_client, database.id)
-
-    LOG.info(f"Getting page back using {page.id=}")
-    retrieved_page = await notion_client.get_page(page_id=page.id)
-    if page != retrieved_page:
-        LOG.warning(
-            f"Huh, retrieved page doesn't look like the one we created:\n{page=}\n{retrieved_page=}"
-        )
-    else:
-        LOG.info("Retrieved page looks like one we created!")
-
     if os.environ.get("NOTIONS_KEEP_EXAMPLE_PAGES"):
-        LOG.info("NOTIONS_KEEP_EXAMPLE_PAGES set, keeping pages")
+        LOG.info("NOTIONS_KEEP_EXAMPLE_PAGES set, keeping database")
     else:
-        update_page_request = UpdatePage(archived=True, properties=page.properties)
-        LOG.info(f"Sending page update request:\n{update_page_request.json(indent=2)}")
-        LOG.info(f"Deleting (archiving) page {page.id=}")
-        await notion_client.update_page(page.id, update_page_request)
-
         # TODO: delete database
         LOG.info(f"Deleting database {database.id=}")
         LOG.warning(

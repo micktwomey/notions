@@ -2,7 +2,7 @@ import json
 
 from notions.models.database import Database
 
-# notions api GET /v1/databases/fff51adc-8d4e-414a-a2e3-17e69111c328 | pbcopy
+# notions api GET /v1/databases/fff51adc-8d4e-414a-a2e3-17e69111c328 | jq . | pbcopy
 # Modified 00.000Z -> 00+00:00 to make roundtrip comparison easier
 # Fixed up \" -> \\" to make parsing work
 EXAMPLE_DATABASE_JSON = """
@@ -58,13 +58,13 @@ EXAMPLE_DATABASE_JSON = """
       "people": {}
     },
     "Checkbox property": {
-      "id": "L<}@",
+      "id": "L%3C%7D%40",
       "name": "Checkbox property",
       "type": "checkbox",
       "checkbox": {}
     },
     "Email property": {
-      "id": "Mqx<",
+      "id": "Mqx%3C",
       "name": "Email property",
       "type": "email",
       "email": {}
@@ -131,25 +131,25 @@ EXAMPLE_DATABASE_JSON = """
       "files": {}
     },
     "Date property": {
-      "id": "eo~[",
+      "id": "eo~%5B",
       "name": "Date property",
       "type": "date",
       "date": {}
     },
     "Date Rollup property": {
-      "id": "fm]d",
+      "id": "fm%5Dd",
       "name": "Date Rollup property",
       "type": "rollup",
       "rollup": {
         "rollup_property_name": "Date property",
         "relation_property_name": "Relation Property",
-        "rollup_property_id": "eo~[",
+        "rollup_property_id": "eo~%5B",
         "relation_property_id": "_GWY",
         "function": "date_range"
       }
     },
     "Created by property": {
-      "id": "f{ol",
+      "id": "f%7Bol",
       "name": "Created by property",
       "type": "created_by",
       "created_by": {}
@@ -161,7 +161,7 @@ EXAMPLE_DATABASE_JSON = """
       "rich_text": {}
     },
     "Created Time Property": {
-      "id": "l;Me",
+      "id": "l%3BMe",
       "name": "Created Time Property",
       "type": "created_time",
       "created_time": {}
@@ -197,7 +197,7 @@ EXAMPLE_DATABASE_JSON = """
       "rollup": {
         "rollup_property_name": "Email property",
         "relation_property_name": "Relation Property",
-        "rollup_property_id": "Mqx<",
+        "rollup_property_id": "Mqx%3C",
         "relation_property_id": "_GWY",
         "function": "show_original"
       }

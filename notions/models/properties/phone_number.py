@@ -16,7 +16,7 @@ class DatabasePhoneNumberProperty(pydantic.BaseModel):
 class PagePhoneNumberProperty(pydantic.BaseModel):
     id: str
     type: typing.Literal["phone_number"] = "phone_number"
-    phone_number: str
+    phone_number: typing.Optional[str]
 
     def get_value(self):
         return self.phone_number

@@ -28,7 +28,14 @@ class RichTextText(pydantic.BaseModel):
     type: typing.Literal["text"] = "text"
     plain_text: str
     href: typing.Optional[str]
-    annotations: Annotations
+    annotations: Annotations = Annotations(
+        bold=False,
+        italic=False,
+        strikethrough=False,
+        underline=False,
+        code=False,
+        color=Color.default,
+    )
     text: Text
 
     def get_value(self):

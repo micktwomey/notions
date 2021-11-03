@@ -14,7 +14,7 @@ EXAMPLE_FLAT_PAGE = {
     "id": uuid.UUID("ccad10e7-c776-423e-9662-6ad5fb1256d6"),
     "created_time": datetime.datetime(2021, 7, 31, 17, 1, tzinfo=datetime.timezone.utc),
     "last_edited_time": datetime.datetime(
-        2021, 7, 31, 18, 31, tzinfo=datetime.timezone.utc
+        2021, 10, 25, 17, 31, tzinfo=datetime.timezone.utc
     ),
     "archived": False,
     "properties": {
@@ -107,7 +107,15 @@ EXAMPLE_FLAT_PAGE = {
             "key": "file_property",
             "name": "File property",
             "type": "files",
-            "value": [{"name": "p8logo.png"}],
+            "value": [
+                {
+                    "url": "https://s3.us-west-2.amazonaws.com/secure.notion-static.com/8ebae53f-21ba-4441-b622-95806a8896fa/p8logo.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20211025%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20211025T173928Z&X-Amz-Expires=3600&X-Amz-Signature=65a3f9b59d5fa8aca605bae3763415edd26d652a46d7ea8093c06ac4ebd55088&X-Amz-SignedHeaders=host",
+                    "expiry_time": datetime.datetime(
+                        2021, 10, 25, 18, 39, 28, 188000, tzinfo=datetime.timezone.utc
+                    ),
+                },
+                "https://www.nasa.gov/sites/default/files/styles/full_width_feature/public/thumbnails/image/potw2142a.jpg",
+            ],
         },
         "date_property": {
             "key": "date_property",
@@ -159,7 +167,7 @@ EXAMPLE_FLAT_PAGE = {
             "key": "string_formula_property",
             "name": "String Formula Property",
             "type": "formula",
-            "value": "July 31 2021, 23:46",
+            "value": "October 25 2021, 17:39",
         },
         "number_formula_property": {
             "key": "number_formula_property",
@@ -173,7 +181,7 @@ EXAMPLE_FLAT_PAGE = {
             "type": "formula",
             "value": {
                 "start": datetime.datetime(
-                    2021, 7, 31, 23, 46, tzinfo=datetime.timezone.utc
+                    2021, 10, 25, 17, 39, tzinfo=datetime.timezone.utc
                 ),
                 "end": None,
             },
@@ -189,7 +197,7 @@ EXAMPLE_FLAT_PAGE = {
             "name": "Last Edited Time Property",
             "type": "last_edited_time",
             "value": datetime.datetime(
-                2021, 7, 31, 18, 31, tzinfo=datetime.timezone.utc
+                2021, 10, 25, 17, 31, tzinfo=datetime.timezone.utc
             ),
         },
         "select_property": {
@@ -325,7 +333,7 @@ EXAMPLE_FLAT_DATABASE = {
                 "relation_property_name": "Relation Property",
                 "relation_property_id": "_GWY",
                 "rollup_property_name": "Date property",
-                "rollup_property_id": "eo~[",
+                "rollup_property_id": "eo~%5B",
                 "function": "date_range",
             },
         },
@@ -373,7 +381,7 @@ EXAMPLE_FLAT_DATABASE = {
                 "relation_property_name": "Relation Property",
                 "relation_property_id": "_GWY",
                 "rollup_property_name": "Email property",
-                "rollup_property_id": "Mqx<",
+                "rollup_property_id": "Mqx%3C",
                 "function": "show_original",
             },
         },

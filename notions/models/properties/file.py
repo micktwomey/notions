@@ -2,21 +2,23 @@ import typing
 
 import pydantic
 
+from ..file import File
 
-class DatabaseFilesProperty(pydantic.BaseModel):
+
+class DatabaseFileProperty(pydantic.BaseModel):
     id: str
     name: str
     type: typing.Literal["files"] = "files"
-    files: dict = pydantic.Field(default_factory=dict)
+    files: typing.Dict
 
     def get_value(self):
         return self.files
 
 
-class PageFilesProperty(pydantic.BaseModel):
+class PageFileProperty(pydantic.BaseModel):
     id: str
     type: typing.Literal["files"] = "files"
-    files: typing.List[typing.Dict[str, str]]
+    files: typing.List[File]
 
     def get_value(self):
-        return self.files
+        return [f.get_value() for f in self.files]

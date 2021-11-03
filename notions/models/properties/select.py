@@ -47,10 +47,10 @@ class PageSelectOption(pydantic.BaseModel):
 class PageSelectProperty(pydantic.BaseModel):
     id: str
     type: typing.Literal["select"] = "select"
-    select: PageSelectOption
+    select: typing.Optional[PageSelectOption]
 
     def get_value(self):
-        return self.select.get_value()
+        return self.select.get_value() if self.select is not None else None
 
 
 class CreatePageSelectOption(pydantic.BaseModel):
@@ -60,4 +60,4 @@ class CreatePageSelectOption(pydantic.BaseModel):
 
 class CreatePageSelectProperty(pydantic.BaseModel):
     type: typing.Literal["select"] = "select"
-    select: CreatePageSelectOption
+    select: typing.Optional[CreatePageSelectOption]

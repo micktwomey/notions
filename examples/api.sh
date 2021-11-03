@@ -4,6 +4,8 @@
 
 set -xeuo pipefail
 
+# `notions api` examples
+
 #
 # Listing databases
 #

@@ -16,7 +16,7 @@ class DatabaseURLProperty(pydantic.BaseModel):
 class PageURLProperty(pydantic.BaseModel):
     id: str
     type: typing.Literal["url"] = "url"
-    url: str
+    url: typing.Optional[str]
 
     def get_value(self):
         return self.url
