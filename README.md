@@ -224,7 +224,7 @@ There are more examples in [examples/](examples/). You might need to set more en
 
 # Developing Notions
 
-The easiest way to develop locally is to install [asdf](https://asdf-vm.com) and [poetry](https://python-poetry.org).
+The easiest way to develop locally is to install [asdf](https://asdf-vm.com) and [poetry](https://python-poetry.org). Note: there is a bug in the asdf just plugin, you might need to install it using `asdf plugin add just git@github.com:heliumbrain/asdf-just.git`.
 
 Then you can run:
 
