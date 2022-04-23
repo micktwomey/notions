@@ -6,7 +6,7 @@ import uuid
 import typer
 
 from notions.client import NotionAsyncClient
-from notions.models.query_database import QueryDatabase, QueryDatabaseSort
+from notions.models.query_database import Direction, QueryDatabase, QueryDatabaseSort
 
 from . import yaml
 from .config import CONFIG, OutputFormats
@@ -47,10 +47,11 @@ async def run_query_databases(
     for sort in sorts:
         if len(sort) == 1:
             query_sorts.append(
-                QueryDatabaseSort(property=sort[0], direction="ascending")
+                QueryDatabaseSort(property=sort[0], direction=Direction.ascending)
             )
         elif len(sort) == 2:
-            query_sorts.append(QueryDatabaseSort(property=sort[0], direction=sort[1]))
+            direction = Direction(sort[1])
+            query_sorts.append(QueryDatabaseSort(property=sort[0], direction=direction))
         else:
             raise ValueError(f"Invalid sort: {sort=}")
     query = QueryDatabase(sorts=query_sorts)

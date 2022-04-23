@@ -21,13 +21,13 @@ class TextLink(pydantic.BaseModel):
 
 class Text(pydantic.BaseModel):
     content: str
-    link: typing.Optional[TextLink]
+    link: typing.Optional[TextLink] = None
 
 
 class RichTextText(pydantic.BaseModel):
     type: typing.Literal["text"] = "text"
     plain_text: str
-    href: typing.Optional[str]
+    href: typing.Optional[str] = None
     annotations: Annotations = Annotations(
         bold=False,
         italic=False,
@@ -42,4 +42,4 @@ class RichTextText(pydantic.BaseModel):
         return self.plain_text
 
 
-RichText = typing.Union[RichTextText]
+RichText = RichTextText

@@ -36,4 +36,4 @@ class PageTitleProperty(pydantic.BaseModel):
 
 class CreatePageTitleProperty(pydantic.BaseModel):
     type: typing.Literal["title"] = "title"
-    title: typing.List[dict]
+    title: typing.List[typing.Union[dict, RichText]]
