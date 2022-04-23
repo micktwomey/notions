@@ -224,27 +224,30 @@ There are more examples in [examples/](examples/). You might need to set more en
 
 # Developing Notions
 
-To develop locally you'll need python 3.6+, [poetry](https://python-poetry.org) and make:
+The easiest way to develop locally is to install [asdf](https://asdf-vm.com) and [poetry](https://python-poetry.org).
 
-1. `make dep` to set up the development environment.
-2. `make test` to test all supported pythons or `make pytest` to run tests more directly for your python.
+Then you can run:
 
-You'll need a plan which allows for creating Notion integrations (API access) to develop against Notion, but I'm going to assume you have that if you're interested in this library :D
+1. `asdf install` to install all the pythons and dev tools needed.
+2. `just bootstrap-dev-env` to set up the development environment.
+3. `just nox` to test all supported pythons or `just pytest-all` to run tests more directly for your python. For faster tests you can run `just pytest` (or just `just`).
 
-To release ensure you're happy with the current state of main and run `make release`.
+You'll need a Notion plan which allows for creating Notion integrations (API access) to develop against Notion, but I'm going to assume you have that if you're interested in this library :D
+
+To release ensure you're happy with the current state of main and run `just prepare-release` then `just do-release`.
 
 ## Testing Against the Real Notion API
 
 All the examples can also run as part of the tests. There is a bit of setup to do this:
 
-1. Create a new top level page in your Notion. Call it something like "notions-test" so you can see it easily.
+1. Create a new top level page in your Notion. Call it something like "notions-test" so you can see it easily. It can be private to you.
 2. Make sure you share it with the API integration you previously created (see [Authentication](#authentication) above). Use the "Share" control on the top right of the page to do this.
 3. Get hold of the page's id. One way to do this is to use the "Share" -> "Copy link" to get the link. You can then copy out the ID. e.g. `https://www.notion.so/twomeylee/notions-test-76c28a7477334346807696ce8622a9fc` becomes `76c28a7477334346807696ce8622a9fc` for testing.
 4. Ensure you set the following two environment variables (use a `.env` file or exports in your shell):
    1. `NOTION_API_KEY` - the API key from the integration you created during [authentication](#authentication).
    2. `NOTIONS_PARENT_PAGE_UUID` - the ID from the page you created above.
-   3. Optional: `NOTIONS_KEEP_EXAMPLE_PAGES` - set this to anythin to keep any created pages during the examples for inspection later.
-5. When you run `make pytest` it should now run these tests. Alternatively, you can run the examples directly using `python example/the_example.py`.
+   3. Optional: `NOTIONS_KEEP_EXAMPLE_PAGES` - set this to anything to keep any created pages during the examples for inspection later.
+5. When you run `just pytest-all` it should now run these tests. Alternatively, you can run the examples directly using `python example/the_example.py`.
 
 Unfortunately it's not currently possible to cleanly remove all the detritus from the examples via the API, some cleanup steps are needed:
 
