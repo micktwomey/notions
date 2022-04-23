@@ -1,12 +1,18 @@
+import enum
 import typing
 
 import pydantic
 
 
+class Direction(enum.Enum):
+    ascending = "ascending"
+    descending = "descending"
+
+
 class QueryDatabaseSort(pydantic.BaseModel):
     property: typing.Optional[str] = None
     timestamp: typing.Optional[str] = None
-    direction: typing.Literal["ascending", "descending"]
+    direction: Direction
 
 
 class QueryDatabase(pydantic.BaseModel):

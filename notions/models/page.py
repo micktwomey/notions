@@ -31,19 +31,19 @@ class CreatePagePageParent(pydantic.BaseModel):
     page_id: uuid.UUID
 
 
-CreatePageParents = typing.Union[CreatePageDatabaseParent]
+CreatePageParents = CreatePageDatabaseParent
 
 
 class CreatePage(pydantic.BaseModel):
     parent: CreatePageParents
     properties: CreatePageProperties
     children: list  # TODO: define block types
-    icon: typing.Optional[Emoji]
-    cover: typing.Optional[PageCover]
+    icon: typing.Optional[Emoji] = None
+    cover: typing.Optional[PageCover] = None
 
 
 class UpdatePage(pydantic.BaseModel):
     properties: PageProperties
     archived: bool = False
-    icon: typing.Optional[Emoji]
-    cover: typing.Optional[PageCover]
+    icon: typing.Optional[Emoji] = None
+    cover: typing.Optional[PageCover] = None

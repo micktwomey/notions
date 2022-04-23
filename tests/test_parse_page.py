@@ -501,7 +501,7 @@ def test_parse_page():
                                 strikethrough=False,
                                 underline=False,
                                 code=False,
-                                color="default",
+                                color=Color.default,
                             ),
                             text=Text(content="Foo"),
                         )
@@ -564,7 +564,7 @@ def test_parse_page():
                                 strikethrough=False,
                                 underline=False,
                                 code=False,
-                                color="default",
+                                color=Color.default,
                             ),
                             text=Text(content="Fields filled in"),
                         )
