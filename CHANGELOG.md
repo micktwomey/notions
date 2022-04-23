@@ -9,13 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add database and page creation
 - Switch to just from make for running development commands
 - Added this changelog
+- Add a NotionAPIResponse model which handles all Notion API responses.
+- Add a NotionAPIResponseError exception to wrap all API errors.
 
 ### Fixed
 - Fix list database call
 
 ### Changed
-- Refactor properties
+- Refactor properties. Now a single module holds the database and page properties, as well as the create versions.
 - Changed QueryDatabaseSort direction to an enum
+
+### Removed
+- Remove request and update modules, moving related classes into the respective database and page modules.
 
 ## [0.3.0] - 20221-08-24
 ### Added
