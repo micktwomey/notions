@@ -44,7 +44,7 @@ class NotionAsyncClient:
         self,
         api_token: str,
         base_url="https://api.notion.com/",
-        notion_version="2021-08-16",
+        notion_version="2022-02-22",
     ):
         self.api_token = api_token
         self.base_url = furl.furl(base_url)
@@ -111,7 +111,7 @@ class NotionAsyncClient:
         method: str,
         url: furl.furl,
         pagination_in_json: bool,
-        data: str = None,
+        data: typing.Optional[str] = None,
         *args: typing.Any,
         **kwargs: typing.Any,
     ):
@@ -122,7 +122,7 @@ class NotionAsyncClient:
         while has_more:
             if start_cursor is not None:
                 # start_cursor is set either in the json body or the query params, depending on the request
-                if pagination_in_json:
+                if pagination_in_json and data:
                     LOG.debug(f"Setting {start_cursor=} in JSON body")
                     # Since the data is already encoded by pydantic, load, update and re-encode it
                     request_json = json.loads(data)
@@ -165,21 +165,6 @@ class NotionAsyncClient:
             for item in page.iter_results():
                 LOG.debug(f"{item=}")
                 if isinstance(item, Page):
-                    yield item
-                else:
-                    LOG.warning(f"Got unexpected item when querying database: {item=}")
-
-    async def list_databases(self) -> typing.AsyncIterable[Database]:
-        """Performs a GET /databases
-
-        https://developers.notion.com/reference/get-databases
-        """
-        async for page in self.paginated_request(
-            "GET", self.base_url / "v1/databases", pagination_in_json=False
-        ):
-            for item in page.iter_results():
-                LOG.debug(f"{item=}")
-                if isinstance(item, Database):
                     yield item
                 else:
                     LOG.warning(f"Got unexpected item when querying database: {item=}")

@@ -7,6 +7,7 @@ import typer
 
 from notions.client import NotionAsyncClient
 from notions.models.query_database import Direction, QueryDatabase, QueryDatabaseSort
+from notions.models.search import Search, SearchFilter
 
 from . import yaml
 from .config import CONFIG, OutputFormats
@@ -19,7 +20,9 @@ async def run_list_databases(
     client: NotionAsyncClient, output: typing.TextIO, output_format: OutputFormats
 ):
     await run(
-        client.list_databases(),
+        client.search(
+            search=Search(filter=SearchFilter(value="database", property="object"))
+        ),
         output=output,
         output_format=output_format,
     )
