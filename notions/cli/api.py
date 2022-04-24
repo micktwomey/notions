@@ -13,7 +13,9 @@ app = typer.Typer()
 
 
 async def paginated_request(client: NotionAsyncClient, method: str, url: furl.furl):
-    async for page in client.paginated_request(method, url, pagination_in_json=False):
+    async for page in client.paginated_request(
+        method, url, pagination_in_json=False, data=None
+    ):
         for item in page.iter_results():
             yield item
 

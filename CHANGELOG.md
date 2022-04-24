@@ -18,9 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Refactor properties. Now a single module holds the database and page properties, as well as the create versions.
 - Changed QueryDatabaseSort direction to an enum
+- Updated to Notion API 2022-02-22
 
 ### Removed
 - Remove request and update modules, moving related classes into the respective database and page modules.
+- Remove list_databases methods, deprecated by Notion
 
 ## [0.3.0] - 20221-08-24
 ### Added

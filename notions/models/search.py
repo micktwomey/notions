@@ -4,8 +4,8 @@ import pydantic
 
 
 class SearchFilter(pydantic.BaseModel):
-    value: typing.Literal["page", "database"] = "page"
-    property: typing.Literal["object"] = "object"
+    value: typing.Literal["page", "database"]
+    property: typing.Literal["object"]
 
 
 class SearchSort(pydantic.BaseModel):
