@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """Represents blocks
 
 https://developers.notion.com/reference/block
@@ -10,38 +12,10 @@ import uuid
 
 import pydantic
 
+import notions.models.file
 from notions.models.color import Color
 from notions.models.emoji import Emoji
-from notions.models.file import File
 from notions.models.rich_text import RichText
-
-Block = typing.Union[
-    "ParagraphBlock",
-    "Heading1Block",
-    "Heading2Block",
-    "Heading3Block",
-    "CalloutBlock",
-    "QuoteBlock",
-    "BulletedListItemBlock",
-    "NumberedListItemBlock",
-    "TodoBlock",
-    "ToggleBlock",
-    "CodeBlock",
-    "ChildPageBlock",
-    "ChildDatabaseBlock",
-    "EmbedBlock",
-    "ImageBlock",
-    "VideoBlock",
-    "FileBlock",
-    "PdfBlock",
-    "BookmarkBlock",
-    "EquationBlock",
-    "DividerBlock",
-    "TableOfContentsBlock",
-    "BreadcrumbBlock",
-    "ColumnListBlock",
-    "ColumnBlock",
-]
 
 
 class BaseBlock(pydantic.BaseModel, abc.ABC):
@@ -94,7 +68,7 @@ class Heading3Block(BaseBlock):
 
 class Callout(pydantic.BaseModel):
     rich_text: list[RichText]
-    icon: typing.Union[File, Emoji]
+    icon: typing.Union[notions.models.file.File, Emoji]
     color: Color
     children: list[Block]
 
@@ -104,38 +78,58 @@ class CalloutBlock(BaseBlock):
     callout: Callout
 
 
+class Quote(pydantic.BaseModel):
+    rich_text: list[RichText]
+    color: Color
+    children: list[Block]
+
+
 class QuoteBlock(BaseBlock):
     type: typing.Literal["quote"] = "quote"
-    rich_text: list[RichText]
+    quote: Quote
+
+
+class BulletedListItem(pydantic.BaseModel):
     color: Color
     children: list[Block]
 
 
 class BulletedListItemBlock(BaseBlock):
     type: typing.Literal["bulleted_list_item"] = "bulleted_list_item"
+    bulleted_list_item: BulletedListItem
+
+
+class NumberedListItem(pydantic.BaseModel):
     color: Color
     children: list[Block]
 
 
 class NumberedListItemBlock(BaseBlock):
     type: typing.Literal["numbered_list_item"] = "numbered_list_item"
-    color: Color
-    children: list[Block]
+    numbered_list_item: NumberedListItem
 
 
-class TodoBlock(BaseBlock):
-    type: typing.Literal["to_do"] = "to_do"
+class Todo(pydantic.BaseModel):
     rich_text: list[RichText]
     checked: bool = False
     color: Color
     children: list[Block]
 
 
-class ToggleBlock(BaseBlock):
-    type: typing.Literal["toggle"] = "toggle"
+class TodoBlock(BaseBlock):
+    type: typing.Literal["to_do"] = "to_do"
+    to_do: Todo
+
+
+class Toggle(pydantic.BaseModel):
     rich_text: list[RichText]
     color: Color
     children: list[Block]
+
+
+class ToggleBlock(BaseBlock):
+    type: typing.Literal["toggle"] = "toggle"
+    toggle: Toggle
 
 
 class Language(enum.Enum):
@@ -213,92 +207,152 @@ class Language(enum.Enum):
     java_c_cpp_csharp = "java/c/c++/c#"
 
 
-class CodeBlock(BaseBlock):
-    type: typing.Literal["code"] = "code"
+class Code(pydantic.BaseModel):
     rich_text: list[RichText]
     caption: list[RichText]
     language: Language
 
 
+class CodeBlock(BaseBlock):
+    type: typing.Literal["code"] = "code"
+    code: Code
+
+
+class ChildPage(pydantic.BaseModel):
+    title: str
+
+
 class ChildPageBlock(BaseBlock):
     type: typing.Literal["child_page"] = "child_page"
+    child_page: ChildPage
+
+
+class ChildDatabase(pydantic.BaseModel):
     title: str
 
 
 class ChildDatabaseBlock(BaseBlock):
     type: typing.Literal["child_database"] = "child_database"
-    title: str
+    child_database: ChildDatabase
+
+
+class Embed(pydantic.BaseModel):
+    url: str
 
 
 class EmbedBlock(BaseBlock):
     type: typing.Literal["embed"] = "embed"
-    url: str
+    embed: Embed
+
+
+class Image(pydantic.BaseModel):
+    image: notions.models.file.File
 
 
 class ImageBlock(BaseBlock):
     type: typing.Literal["image"] = "image"
-    image: File
+    image: Image
+
+
+class Video(pydantic.BaseModel):
+    video: notions.models.file.File
 
 
 class VideoBlock(BaseBlock):
     type: typing.Literal["video"] = "video"
-    video: File
+    video: Video
+
+
+class File(pydantic.BaseModel):
+    file: notions.models.file.File
+    caption: list[RichText]
 
 
 class FileBlock(BaseBlock):
     type: typing.Literal["file"] = "file"
     file: File
-    caption: list[RichText]
+
+
+class Pdf(pydantic.BaseModel):
+    pdf: notions.models.file.File
 
 
 class PdfBlock(BaseBlock):
     type: typing.Literal["pdf"] = "pdf"
-    pdf: File
+    pdf: Pdf
 
 
-class BookmarkBlock(BaseBlock):
-    type: typing.Literal["bookmark"] = "bookmark"
+class Bookmark(pydantic.BaseModel):
     url: str
     caption: list[RichText]
 
 
+class BookmarkBlock(BaseBlock):
+    type: typing.Literal["bookmark"] = "bookmark"
+    bookmark: Bookmark
+
+
+class Equation(pydantic.BaseModel):
+    expression: str
+
+
 class EquationBlock(BaseBlock):
     type: typing.Literal["equation"] = "equation"
-    expression: str
+    equation: Equation
 
 
 class DividerBlock(BaseBlock):
     type: typing.Literal["divider"] = "divider"
 
 
+class TableOfContents(pydantic.BaseModel):
+    color: Color
+
+
 class TableOfContentsBlock(BaseBlock):
     type: typing.Literal["table_of_contents"] = "table_of_contents"
-    color: Color
+    table_of_contents: TableOfContents
 
 
 class BreadcrumbBlock(BaseBlock):
     type: typing.Literal["breadcrumb"] = "breadcrumb"
 
 
+class Column(pydantic.BaseModel):
+    children: list[Block]
+
+
 class ColumnBlock(BaseBlock):
     type: typing.Literal["column"] = "column"
-    children: list[Block]
+    column: Column
+
+
+class ColumnList(pydantic.BaseModel):
+    children: list[ColumnBlock]
 
 
 class ColumnListBlock(BaseBlock):
     type: typing.Literal["column_list"] = "column_list"
-    children: list[ColumnBlock]
+    column_list: ColumnList
+
+
+class LinkPreview(pydantic.BaseModel):
+    url: str
 
 
 class LinkPreviewBlock(BaseBlock):
     type: typing.Literal["link_preview"] = "link_preview"
-    url: str
+    link_preview: LinkPreview
+
+
+class Template(pydantic.BaseModel):
+    rich_text: list[RichText]
+    children: list[Block]
 
 
 class TemplateBlock(BaseBlock):
     type: typing.Literal["template"] = "template"
-    rich_text: list[RichText]
-    children: list[Block]
+    template: Template
 
 
 class LinkToPage(pydantic.BaseModel):
@@ -316,3 +370,48 @@ class LinkToPageBlock(BaseBlock):
     link_to_page: typing.Union[LinkToPage, LinkToDatabase] = pydantic.Field(
         ..., discriminator="type"
     )
+
+
+BlockType = typing.Union[
+    ParagraphBlock,
+    Heading1Block,
+    Heading2Block,
+    Heading3Block,
+    CalloutBlock,
+    QuoteBlock,
+    BulletedListItemBlock,
+    NumberedListItemBlock,
+    TodoBlock,
+    ToggleBlock,
+    CodeBlock,
+    ChildPageBlock,
+    ChildDatabaseBlock,
+    EmbedBlock,
+    ImageBlock,
+    VideoBlock,
+    FileBlock,
+    PdfBlock,
+    BookmarkBlock,
+    EquationBlock,
+    DividerBlock,
+    TableOfContentsBlock,
+    BreadcrumbBlock,
+    ColumnListBlock,
+    ColumnBlock,
+]
+
+# Use a pydantic model with a custom root so we can use a custom discriminator on the type
+# Faster parsing and nicer errors
+class Block(pydantic.BaseModel):
+    __root__: BlockType = pydantic.Field(..., discriminator="type")
+
+
+# Update forward refs for blocks with children
+Callout.update_forward_refs()
+Quote.update_forward_refs()
+BulletedListItem.update_forward_refs()
+NumberedListItem.update_forward_refs()
+Todo.update_forward_refs()
+Toggle.update_forward_refs()
+Column.update_forward_refs()
+Template.update_forward_refs()

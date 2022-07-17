@@ -20,6 +20,34 @@ GENERIC_BLOCK = {
     "archived": False,
 }
 
+GENERIC_COLOR = color.Color.default
+
+GENERIC_RICH_TEXT = [
+    {
+        "type": "text",
+        "plain_text": "Lacinato kale",
+        "text": {"content": "Lacinato kale"},
+    }
+]
+
+GENERIC_CHILDREN = [
+    {
+        **GENERIC_BLOCK,
+        **{
+            "type": "heading_1",
+            "heading_1": {"rich_text": GENERIC_RICH_TEXT, "color": GENERIC_COLOR},
+        },
+    }
+]
+
+GENERIC_EMOJI = {"type": "emoji", "emoji": "🤪"}
+
+GENERIC_FILE = {
+    "name": "myfile.jpg",
+    "type": "external",
+    "external": {"url": "https://example.com/myfile.jpg"},
+}
+
 
 @pytest.mark.parametrize(
     "json_block,block_type",
@@ -48,14 +76,8 @@ GENERIC_BLOCK = {
             {
                 "type": "heading_1",
                 "heading_1": {
-                    "rich_text": [
-                        {
-                            "type": "text",
-                            "plain_text": "Lacinato kale",
-                            "text": {"content": "Lacinato kale"},
-                        }
-                    ],
-                    "color": color.Color.default,
+                    "rich_text": GENERIC_RICH_TEXT,
+                    "color": GENERIC_COLOR,
                 },
             },
             block.Heading1Block,
@@ -64,14 +86,8 @@ GENERIC_BLOCK = {
             {
                 "type": "heading_2",
                 "heading_2": {
-                    "rich_text": [
-                        {
-                            "type": "text",
-                            "plain_text": "Lacinato kale",
-                            "text": {"content": "Lacinato kale"},
-                        }
-                    ],
-                    "color": color.Color.default,
+                    "rich_text": GENERIC_RICH_TEXT,
+                    "color": GENERIC_COLOR,
                 },
             },
             block.Heading2Block,
@@ -80,14 +96,8 @@ GENERIC_BLOCK = {
             {
                 "type": "heading_3",
                 "heading_3": {
-                    "rich_text": [
-                        {
-                            "type": "text",
-                            "plain_text": "Lacinato kale",
-                            "text": {"content": "Lacinato kale"},
-                        }
-                    ],
-                    "color": color.Color.default,
+                    "rich_text": GENERIC_RICH_TEXT,
+                    "color": GENERIC_COLOR,
                 },
             },
             block.Heading3Block,
@@ -96,19 +106,233 @@ GENERIC_BLOCK = {
             {
                 "type": "callout",
                 "callout": {
-                    "rich_text": [
-                        {
-                            "type": "text",
-                            "plain_text": "Lacinato kale",
-                            "text": {"content": "Lacinato kale"},
-                        }
-                    ],
-                    "icon": {"type": "emoji", "emoji": "🤪"},
-                    "color": color.Color.default,
-                    "children": [],
+                    "rich_text": GENERIC_RICH_TEXT,
+                    "icon": GENERIC_EMOJI,
+                    "color": GENERIC_COLOR,
+                    "children": GENERIC_CHILDREN,
                 },
             },
             block.CalloutBlock,
+        ),
+        (
+            {
+                "type": "quote",
+                "quote": {
+                    "rich_text": GENERIC_RICH_TEXT,
+                    "color": GENERIC_COLOR,
+                    "children": GENERIC_CHILDREN,
+                },
+            },
+            block.QuoteBlock,
+        ),
+        (
+            {
+                "type": "bulleted_list_item",
+                "bulleted_list_item": {
+                    "color": GENERIC_COLOR,
+                    "children": GENERIC_CHILDREN,
+                },
+            },
+            block.BulletedListItemBlock,
+        ),
+        (
+            {
+                "type": "numbered_list_item",
+                "numbered_list_item": {
+                    "color": GENERIC_COLOR,
+                    "children": GENERIC_CHILDREN,
+                },
+            },
+            block.NumberedListItemBlock,
+        ),
+        (
+            {
+                "type": "to_do",
+                "to_do": {
+                    "rich_text": GENERIC_RICH_TEXT,
+                    "checked": True,
+                    "color": GENERIC_COLOR,
+                    "children": GENERIC_CHILDREN,
+                },
+            },
+            block.TodoBlock,
+        ),
+        (
+            {
+                "type": "toggle",
+                "toggle": {
+                    "rich_text": GENERIC_RICH_TEXT,
+                    "color": GENERIC_COLOR,
+                    "children": GENERIC_CHILDREN,
+                },
+            },
+            block.ToggleBlock,
+        ),
+        (
+            {
+                "type": "code",
+                "code": {
+                    "rich_text": GENERIC_RICH_TEXT,
+                    "caption": GENERIC_RICH_TEXT,
+                    "language": block.Language.python,
+                },
+            },
+            block.CodeBlock,
+        ),
+        (
+            {
+                "type": "child_page",
+                "child_page": {
+                    "title": "Child Page",
+                },
+            },
+            block.ChildPageBlock,
+        ),
+        (
+            {
+                "type": "child_database",
+                "child_database": {
+                    "title": "Child Page",
+                },
+            },
+            block.ChildDatabaseBlock,
+        ),
+        (
+            {
+                "type": "embed",
+                "embed": {
+                    "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                },
+            },
+            block.EmbedBlock,
+        ),
+        (
+            {
+                "type": "image",
+                "image": {
+                    "image": GENERIC_FILE,
+                },
+            },
+            block.ImageBlock,
+        ),
+        (
+            {
+                "type": "video",
+                "video": {
+                    "video": GENERIC_FILE,
+                },
+            },
+            block.VideoBlock,
+        ),
+        (
+            {
+                "type": "file",
+                "file": {
+                    "file": GENERIC_FILE,
+                    "caption": GENERIC_RICH_TEXT,
+                },
+            },
+            block.FileBlock,
+        ),
+        (
+            {
+                "type": "pdf",
+                "pdf": {
+                    "pdf": GENERIC_FILE,
+                },
+            },
+            block.PdfBlock,
+        ),
+        (
+            {
+                "type": "bookmark",
+                "bookmark": {
+                    "url": "https://example.com/",
+                    "caption": GENERIC_RICH_TEXT,
+                },
+            },
+            block.BookmarkBlock,
+        ),
+        (
+            {
+                "type": "equation",
+                "equation": {
+                    "expression": "x = 1 / y",
+                },
+            },
+            block.EquationBlock,
+        ),
+        (
+            {
+                "type": "divider",
+            },
+            block.DividerBlock,
+        ),
+        (
+            {
+                "type": "table_of_contents",
+                "table_of_contents": {
+                    "color": GENERIC_COLOR,
+                },
+            },
+            block.TableOfContentsBlock,
+        ),
+        (
+            {
+                "type": "breadcrumb",
+            },
+            block.BreadcrumbBlock,
+        ),
+        (
+            {
+                "type": "column",
+                "column": {"children": GENERIC_CHILDREN},
+            },
+            block.ColumnBlock,
+        ),
+        (
+            {
+                "type": "column_list",
+                "column_list": {
+                    "children": [
+                        {
+                            **GENERIC_BLOCK,
+                            **{
+                                "type": "column",
+                                "column": {"children": GENERIC_CHILDREN},
+                            },
+                        }
+                    ]
+                },
+            },
+            block.ColumnListBlock,
+        ),
+        (
+            {
+                "type": "link_preview",
+                "link_preview": {"url": "https://example.com/"},
+            },
+            block.LinkPreviewBlock,
+        ),
+        (
+            {
+                "type": "template",
+                "template": {
+                    "rich_text": GENERIC_RICH_TEXT,
+                    "children": GENERIC_CHILDREN,
+                },
+            },
+            block.TemplateBlock,
+        ),
+        (
+            {
+                "type": "link_to_page",
+                "link_to_page": {
+                    "type": "database_id",
+                    "database_id": uuid.UUID("18ba39c7-b2ef-41d0-8133-e8f8b1723700"),
+                },
+            },
+            block.LinkToPageBlock,
         ),
     ],
 )
