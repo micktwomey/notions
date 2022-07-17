@@ -51,7 +51,7 @@ async def delete_page(client: NotionAsyncClient, page: Page):
 
 async def main():
     try:
-        import coloredlogs
+        import coloredlogs  # type: ignore
 
         coloredlogs.install(level=logging.INFO)
     except ImportError:

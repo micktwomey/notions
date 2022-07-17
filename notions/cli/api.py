@@ -1,7 +1,6 @@
-import asyncio
 import typing
 
-import furl
+import furl  # type: ignore
 import typer
 
 from notions.client import NotionAsyncClient

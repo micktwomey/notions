@@ -9,14 +9,12 @@ import logging
 import os
 import uuid
 from datetime import datetime
-from decimal import Decimal
 
 from notions.client import NotionAsyncClient
 from notions.models import properties
 from notions.models.color import Color
 from notions.models.database import CreateDatabase, Database
 from notions.models.number import Number, NumberFormat
-from notions.models.page import CreatePage, CreatePageDatabaseParent, Page, UpdatePage
 from notions.models.parent import PageParent
 from notions.models.rich_text import Annotations, RichTextText, Text
 
@@ -59,7 +57,7 @@ async def create_database(
 
 async def main():
     try:
-        import coloredlogs
+        import coloredlogs  # type: ignore
 
         coloredlogs.install(level=logging.INFO)
     except ImportError:

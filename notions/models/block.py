@@ -62,30 +62,46 @@ class ParagraphBlock(BaseBlock):
     children: list[Block]
 
 
+class Heading1(pydantic.BaseModel):
+    rich_text: list[RichText]
+    color: Color
+
+
 class Heading1Block(BaseBlock):
     type: typing.Literal["heading_1"] = "heading_1"
+    heading_1: Heading1
+
+
+class Heading2(pydantic.BaseModel):
     rich_text: list[RichText]
     color: Color
 
 
 class Heading2Block(BaseBlock):
     type: typing.Literal["heading_2"] = "heading_2"
+    heading_2: Heading2
+
+
+class Heading3(pydantic.BaseModel):
     rich_text: list[RichText]
     color: Color
 
 
 class Heading3Block(BaseBlock):
     type: typing.Literal["heading_3"] = "heading_3"
-    rich_text: list[RichText]
-    color: Color
+    heading_3: Heading3
 
 
-class CalloutBlock(BaseBlock):
-    type: typing.Literal["callout"] = "callout"
+class Callout(pydantic.BaseModel):
     rich_text: list[RichText]
     icon: typing.Union[File, Emoji]
     color: Color
     children: list[Block]
+
+
+class CalloutBlock(BaseBlock):
+    type: typing.Literal["callout"] = "callout"
+    callout: Callout
 
 
 class QuoteBlock(BaseBlock):
@@ -286,10 +302,17 @@ class TemplateBlock(BaseBlock):
 
 
 class LinkToPage(pydantic.BaseModel):
-    type: typing.Literal["page_id", "database_id"]
-    children: list[Block]
+    type: typing.Literal["page_id"]
+    page_id: uuid.UUID
+
+
+class LinkToDatabase(pydantic.BaseModel):
+    type: typing.Literal["database_id"]
+    database_id: uuid.UUID
 
 
 class LinkToPageBlock(BaseBlock):
     type: typing.Literal["link_to_page"] = "link_to_page"
-    link_to_page: LinkToPage
+    link_to_page: typing.Union[LinkToPage, LinkToDatabase] = pydantic.Field(
+        ..., discriminator="type"
+    )
