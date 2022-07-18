@@ -9,7 +9,7 @@ homepage = "https://github.com/micktwomey/notions"
 repository = "https://github.com/micktwomey/notions"
 
 [tool.poetry.dependencies]
-python = ">=3.8,<4.0"
+python = ">=3.9,<4.0"
 httpx = ">=0.23.0,<1.0"
 pydantic = ">=1.9.0,<2.0.0"
 typer = ">=0.3.2,<1.0"
