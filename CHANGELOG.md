@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added this changelog
 - Add a NotionAPIResponse model which handles all Notion API responses.
 - Add a NotionAPIResponseError exception to wrap all API errors.
+- Add page block types
+- Add Python 3.11 support
 
 ### Fixed
 - Fix list database call
@@ -23,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Remove request and update modules, moving related classes into the respective database and page modules.
 - Remove list_databases methods, deprecated by Notion
+- Drop Python 3.8 support
 
 ## [0.3.0] - 20221-08-24
 ### Added

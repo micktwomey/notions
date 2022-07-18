@@ -8,4 +8,4 @@ class EmojiEmoji(pydantic.BaseModel):
     emoji: str
 
 
-Emoji = typing.Union[EmojiEmoji]
+Emoji = EmojiEmoji

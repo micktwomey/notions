@@ -2,7 +2,7 @@ import asyncio
 import logging
 import typing
 
-import coloredlogs
+import coloredlogs  # type: ignore
 import typer
 
 from notions.client import NotionAsyncClient

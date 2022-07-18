@@ -9,26 +9,27 @@ homepage = "https://github.com/micktwomey/notions"
 repository = "https://github.com/micktwomey/notions"
 
 [tool.poetry.dependencies]
-python = ">=3.8,<4.0"
-httpx = ">=0.18.2,<1.0"
-pydantic = "^1.9.0"
+python = ">=3.9,<4.0"
+httpx = ">=0.23.0,<1.0"
+pydantic = ">=1.9.0,<2.0.0"
 typer = ">=0.3.2,<1.0"
 furl = ">=2.1.2,<3.0"
 coloredlogs = ">=15.0.1,<16.0"
 PyYAML = ">=5.4.1,<6.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.2.5"
-isort = "^5.10.1"
-mypy = "^0.942"
+pytest = ">=6.2.5,<7.0.0"
+isort = ">=5.10.1,<6.0.0"
+mypy = ">=0.961,<1.0"
 ipython = "^7.25.0"
-black = "^22.3.0"
+black = "^22.6.0"
 docutils = "^0.17.1"
 nox = "^2021.6.12"
 pytest-cov = "^2.12.1"
 pre-commit = "^2.18.1"
 types-PyYAML = "^5.4.3"
 changelog-manager = "^1.3.0"
+iso8601 = "^1.0.2"
 
 [tool.poetry.scripts]
 notions = 'notions.cli.main:app'
@@ -41,7 +42,7 @@ build-backend = "poetry.core.masonry.api"
 profile = "black"
 
 [tool.mypy]
-ignore_missing_imports = true
+ignore_missing_imports = false
 plugins = "pydantic.mypy"
 
 # From https://pydantic-docs.helpmanual.io/mypy_plugin/#configuring-the-plugin

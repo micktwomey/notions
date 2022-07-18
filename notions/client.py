@@ -4,7 +4,7 @@ import logging
 import typing
 import uuid
 
-import furl
+import furl  # type: ignore
 import httpx
 
 from .models.database import CreateDatabase, Database
