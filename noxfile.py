@@ -3,7 +3,18 @@ import nox
 
 @nox.session()
 def lint(session: nox.Session):
-    session.install(".", "mypy", "black", "isort", "types-PyYAML")
+    session.install(
+        ".",
+        "mypy",
+        "black",
+        "isort",
+        "types-PyYAML",
+        "iso8601",
+        "pytest",
+        "httpx",
+        "typer",
+        "nox",
+    )
     session.run("mypy", ".")
     session.run("isort", "--check", ".")
     session.run("black", "--check", ".")
